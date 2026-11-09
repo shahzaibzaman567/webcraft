@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /builder
+Disallow: /settings
+Disallow: /api/
+
+Sitemap: https://webcraft.app/sitemap.xml

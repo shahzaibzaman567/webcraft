@@ -1,0 +1,6 @@
+{
+  "name": "Webcarft - Full-Stack AI Website Builder",
+  "description": "Premium Full-Stack AI Website Builder. Generate frontend, backend APIs, MongoDB & Supabase databases, authentication, and file storage. Connect your own hosting and infrastructure.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,163 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  html {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    scroll-behavior: smooth;
+  }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.25);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.45);
+}
+
+/* Glassmorphism helpers */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.light .glass-panel, html:not(.dark) .glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+/* ─── Light theme for the full-screen studio (builder + dashboard) ─── */
+.studio-light {
+  color-scheme: light;
+}
+
+/* Structural panels become white */
+.studio-light > header,
+.studio-light aside,
+.studio-light .chat-panel,
+.studio-light .bg-\[\#0a0d14\],
+.studio-light .bg-\[\#07090e\],
+.studio-light .bg-\[\#0d111c\],
+.studio-light .bg-\[\#0f1420\] {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+.studio-light .bg-\[\#141926\] {
+  background-color: #f1f5f9 !important;
+}
+
+.studio-light .project-canvas,
+.studio-light .preview-stage {
+  background-color: #e9eef5 !important;
+}
+
+/* Keep the generated project preview and code editor dark */
+.studio-light .preview-stage .bg-\[\#07090e\],
+.studio-light .project-canvas .bg-\[\#0a0d14\],
+.studio-light .bg-\[\#05070c\] {
+  background-color: #07090e !important;
+}
+
+/* Text inside the chrome */
+.studio-light :is(header, aside, .chat-panel, .bg-\[\#0f1420\]) .text-white,
+.studio-light .bg-\[\#0f1420\].text-white {
+  color: #0f172a !important;
+}
+
+.studio-light :is(header, aside, .chat-panel, .bg-\[\#0f1420\]) .text-slate-100,
+.studio-light :is(header, aside, .chat-panel, .bg-\[\#0f1420\]) .text-slate-200,
+.studio-light :is(header, aside, .chat-panel, .bg-\[\#0f1420\]) .text-slate-300 {
+  color: #334155 !important;
+}
+
+.studio-light :is(header, aside, .chat-panel, .bg-\[\#0f1420\]) .text-slate-400 {
+  color: #475569 !important;
+}
+
+.studio-light :is(header, aside, .chat-panel, .bg-\[\#0f1420\]) .text-slate-500,
+.studio-light :is(header, aside, .chat-panel, .bg-\[\#0f1420\]) .text-slate-600 {
+  color: #64748b !important;
+}
+
+/* Restore white text on coloured / dark accent buttons */
+.studio-light :is(header, aside, .chat-panel, .bg-\[\#0f1420\]) :is(.bg-blue-600, .bg-purple-600, .bg-gradient-to-r, .bg-gradient-to-tr, .bg-slate-950, .bg-black, .bg-\[\#00C7B7\]).text-white,
+.studio-light :is(.bg-blue-600, .bg-purple-600, .bg-gradient-to-r, .bg-gradient-to-tr, .bg-slate-950, .bg-black, .bg-\[\#00C7B7\]).text-white {
+  color: #ffffff !important;
+}
+
+/* Borders */
+.studio-light :is(header, aside, .chat-panel, .bg-\[\#0f1420\]) :is(.border-white\/5, .border-white\/10, .border-white\/15) {
+  border-color: #e2e8f0 !important;
+}
+
+/* Subtle surfaces */
+.studio-light :is(header, aside, .chat-panel, .bg-\[\#0f1420\]) .bg-white\/5 {
+  background-color: #f1f5f9 !important;
+}
+
+.studio-light :is(header, aside, .chat-panel, .bg-\[\#0f1420\]) .bg-white\/10 {
+  background-color: #e8edf5 !important;
+}
+
+.studio-light :is(header, aside, .chat-panel, .bg-\[\#0f1420\]) .bg-white\/15 {
+  background-color: #dde5ef !important;
+}
+
+.studio-light :is(header, aside, .chat-panel, .bg-\[\#0f1420\]) .hover\:bg-white\/5:hover {
+  background-color: #f1f5f9 !important;
+}
+
+.studio-light :is(header, aside, .chat-panel, .bg-\[\#0f1420\]) .hover\:bg-white\/10:hover {
+  background-color: #e8edf5 !important;
+}
+
+.studio-light :is(header, aside, .chat-panel, .bg-\[\#0f1420\]) .hover\:bg-white\/15:hover {
+  background-color: #dde5ef !important;
+}
+
+.studio-light :is(header, aside, .chat-panel, .bg-\[\#0f1420\]) .hover\:bg-white\/20:hover {
+  background-color: #dbe3ee !important;
+}
+
+.studio-light :is(header, aside, .chat-panel, .bg-\[\#0f1420\]) .hover\:text-white:hover {
+  color: #0f172a !important;
+}
+
+/* Dark inputs inside light modals */
+.studio-light :is(header, aside, .chat-panel, .bg-\[\#0f1420\]) .bg-\[\#07090e\] {
+  background-color: #f8fafc !important;
+}
+
+.studio-light :is(header, aside, .chat-panel, .bg-\[\#0f1420\]) .placeholder\:text-slate-500::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Glowing text and borders */
+.glow-primary {
+  box-shadow: 0 0 35px -5px rgba(59, 130, 246, 0.3);
+}
+
+.glow-magenta {
+  box-shadow: 0 0 35px -5px rgba(236, 72, 153, 0.35);
+}
+
+.glow-purple {
+  box-shadow: 0 0 35px -5px rgba(168, 85, 247, 0.35);
+}

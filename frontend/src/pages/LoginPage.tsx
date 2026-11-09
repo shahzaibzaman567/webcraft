@@ -1,0 +1,123 @@
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { SignIn } from '@clerk/clerk-react';
+import { Lock, ArrowUp } from 'lucide-react';
+import { DevAuthPanel } from '../components/DevAuthPanel';
+
+const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+export const LoginPage: React.FC = () => {
+  const navigate = useNavigate();
+
+  return (
+    <div className="min-h-screen w-full bg-white dark:bg-[#040819] flex flex-col lg:grid lg:grid-cols-2 text-slate-900 dark:text-white transition-colors duration-300">
+      {/* LEFT COLUMN: Auth */}
+      <div className="flex flex-col justify-between p-8 sm:p-12 md:p-16 max-w-lg w-full mx-auto min-h-screen lg:min-h-0">
+        {/* Top: Logo */}
+        <div>
+          <Link to="/" className="inline-flex items-center gap-3 group mb-10">
+            <img
+              src="/assets/logo.png"
+              alt="Webcarft Logo"
+              className="h-8 w-auto object-contain filter drop-shadow-[0_0_8px_rgba(59,130,246,0.5)] group-hover:scale-105 transition-transform"
+            />
+            <span className="text-xl font-extrabold tracking-tight text-slate-950 dark:text-white">
+              Webcarft
+            </span>
+          </Link>
+
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-950 dark:text-white tracking-tight mb-2">
+            Log in
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mb-8">
+            Welcome back. Sign in to your Webcarft workspace.
+          </p>
+
+          {CLERK_PUBLISHABLE_KEY ? (
+            <div className="flex justify-center w-full">
+              <SignIn
+                routing="path"
+                path="/login"
+                signUpUrl="/signup"
+                afterSignInUrl="/dashboard"
+                appearance={{
+                  elements: {
+                    rootBox: 'w-full',
+                    card: 'w-full shadow-none border border-slate-200 dark:border-white/10 rounded-3xl bg-white dark:bg-[#070c24] p-6',
+                    headerTitle: 'text-slate-900 dark:text-white font-bold text-xl',
+                    headerSubtitle: 'text-slate-500 dark:text-slate-400 text-sm',
+                    socialButtonsBlockButton: 'border border-slate-200 dark:border-white/15 rounded-2xl text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition-all',
+                    formFieldInput: 'rounded-2xl border border-slate-200 dark:border-white/15 bg-white dark:bg-[#070c24] text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500',
+                    formButtonPrimary: 'bg-slate-950 hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 rounded-2xl font-bold text-sm transition-all',
+                    footerActionLink: 'text-blue-600 dark:text-cyan-400 font-semibold hover:underline',
+                  },
+                }}
+              />
+            </div>
+          ) : (
+            <DevAuthPanel mode="signIn" onAuthenticated={() => navigate('/dashboard')} />
+          )}
+
+          <div className="text-center pt-5">
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Don&apos;t have an account?{' '}
+              <Link
+                to="/signup"
+                className="font-bold text-slate-900 dark:text-white underline hover:text-blue-600 dark:hover:text-cyan-400 transition-colors"
+              >
+                Create your account
+              </Link>
+            </p>
+          </div>
+        </div>
+
+        {/* Footnote */}
+        <div className="pt-8 text-center">
+          <div className="inline-flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
+            <Lock className="w-3.5 h-3.5" />
+            <span>Secure authentication powered by Clerk</span>
+          </div>
+        </div>
+      </div>
+
+      {/* RIGHT COLUMN: Radiant Gradient Canvas */}
+      <div className="relative hidden lg:flex flex-col items-center justify-center p-8 lg:p-12 overflow-hidden m-4 sm:m-6 rounded-[36px] bg-gradient-to-tr from-[#ff3366] via-[#9333ea] via-[#3b82f6] to-[#06b6d4] shadow-2xl shadow-purple-900/30">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.25)_100%)]" />
+          <div className="absolute top-0 left-1/4 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-48 h-48 bg-purple-900/20 rounded-full blur-2xl" />
+        </div>
+
+        <div className="relative z-10 text-center mb-8">
+          <div className="inline-flex items-center gap-2 mb-3">
+            <img src="/assets/logo.png" alt="Webcraft Logo" className="h-6 w-auto object-contain filter drop-shadow" />
+            <span className="text-white font-bold text-lg tracking-tight">Webcraft</span>
+          </div>
+          <p className="text-white/70 text-sm max-w-xs">
+            Build complete full-stack apps with AI in seconds
+          </p>
+        </div>
+
+        <div className="relative z-10 w-full max-w-md">
+          <div className="w-full rounded-2xl bg-white backdrop-blur-xl p-2.5 sm:p-3 shadow-2xl border border-white/40 flex items-center justify-between gap-3 group transition-all">
+            <input
+              type="text"
+              readOnly
+              value="Ask Webcraft to build your saas startup."
+              className="w-full bg-transparent border-none text-slate-900 text-xs sm:text-sm px-2 focus:outline-none select-none cursor-default"
+            />
+            <div className="w-9 h-9 rounded-xl bg-slate-950 text-white flex items-center justify-center shrink-0 shadow-md">
+              <ArrowUp className="w-4 h-4 font-bold" />
+            </div>
+          </div>
+
+          <div className="text-center mt-3">
+            <span className="text-[11px] font-medium text-white/80 drop-shadow-sm">
+              Press Enter to start building instantly with AI
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

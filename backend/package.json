@@ -1,0 +1,44 @@
+{
+  "name": "webcraft-backend",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Secure AI backend for Webcraft",
+  "main": "dist/index.js",
+  "engines": {
+    "node": ">=20.19"
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@clerk/backend": "^3.27.0",
+    "@supabase/supabase-js": "^2.119.0",
+    "archiver": "^8.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.1.0",
+    "inngest": "^4.26.2",
+    "mongoose": "^8.24.8",
+    "nodemailer": "^10.3.1",
+    "zod": "^4.6.7"
+  },
+  "overrides": {
+    "minimatch": "^11.0.4"
+  },
+  "devDependencies": {
+    "@types/archiver": "^8.0.0",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/mongoose": "^5.11.96",
+    "@types/node": "^22.15.0",
+    "@types/nodemailer": "^8.0.2",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.3"
+  }
+}
