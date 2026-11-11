@@ -132,6 +132,17 @@ router.get(
 
     const statsByProvider = new Map(providerStats.map((stat) => [stat._id, stat]));
     const requestsToday = providerStats.reduce((sum, stat) => sum + stat.requestsToday, 0);
+
+    // Compute live real project count for recent users
+    const recentEmails = recentUsers.map((u) => u.email.toLowerCase()).filter(Boolean);
+    const recentCounts = recentEmails.length > 0
+      ? await Project.aggregate<{ _id: string; count: number }>([
+        { $match: { userEmail: { $in: recentEmails } } },
+        { $group: { _id: { $toLower: '$userEmail' }, count: { $sum: 1 } } },
+      ])
+      : [];
+    const recentCountMap = new Map(recentCounts.map((item) => [item._id, item.count]));
+
     const keyPoolStats = PROVIDERS.map((provider) => {
       const stat = statsByProvider.get(provider);
       return {
@@ -160,7 +171,7 @@ router.get(
             avatar: user.avatar ?? '',
             role: user.role,
             status: user.status,
-            projectsCount: user.projectsCount,
+            projectsCount: recentCountMap.get(user.email.toLowerCase()) ?? user.projectsCount ?? 0,
             lastActive: user.lastActive,
             joined: user.createdAt,
           })),
@@ -224,8 +235,8 @@ router.get(
     const topEmails = topGroups.map((entry) => entry._id).filter(Boolean);
     const users = topEmails.length
       ? await User.find({ email: { $in: topEmails } })
-          .select('name email avatar role status projectsCount lastActive')
-          .lean()
+        .select('name email avatar role status projectsCount lastActive')
+        .lean()
       : [];
     const usersByEmail = new Map(users.map((user) => [user.email.toLowerCase(), user]));
 
@@ -292,6 +303,16 @@ router.get(
       User.countDocuments(filter),
     ]);
 
+    // Compute live real project count for each user from MongoDB
+    const userEmails = users.map((u) => u.email.toLowerCase()).filter(Boolean);
+    const projectCounts = userEmails.length > 0
+      ? await Project.aggregate<{ _id: string; count: number }>([
+        { $match: { userEmail: { $in: userEmails } } },
+        { $group: { _id: { $toLower: '$userEmail' }, count: { $sum: 1 } } },
+      ])
+      : [];
+    const countMap = new Map(projectCounts.map((item) => [item._id, item.count]));
+
     res.json({
       success: true,
       data: {
@@ -302,7 +323,7 @@ router.get(
           avatar: user.avatar ?? '',
           role: user.role,
           status: user.status,
-          projectsCount: user.projectsCount,
+          projectsCount: countMap.get(user.email.toLowerCase()) ?? user.projectsCount ?? 0,
           lastActive: user.lastActive,
           joined: user.createdAt,
         })),

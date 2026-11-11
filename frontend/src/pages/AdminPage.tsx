@@ -180,14 +180,12 @@ function Toggle({
       type="button"
       disabled={disabled}
       onClick={() => onChange(!checked)}
-      className={`w-10 h-5 rounded-full transition-colors relative cursor-pointer disabled:opacity-50 ${
-        checked ? 'bg-purple-600' : 'bg-slate-700'
-      }`}
+      className={`w-10 h-5 rounded-full transition-colors relative cursor-pointer disabled:opacity-50 ${checked ? 'bg-purple-600' : 'bg-slate-700'
+        }`}
     >
       <div
-        className={`w-4 h-4 rounded-full bg-white transition-transform ${
-          checked ? 'translate-x-5' : 'translate-x-0.5'
-        }`}
+        className={`w-4 h-4 rounded-full bg-white transition-transform ${checked ? 'translate-x-5' : 'translate-x-0.5'
+          }`}
       />
     </button>
   );
@@ -242,14 +240,12 @@ function AdminGate({
   const [value, setValue] = useState('');
   return (
     <div
-      className={`h-screen w-screen flex items-center justify-center p-4 ${
-        isDark ? 'bg-[#080c16] text-white' : 'bg-slate-100 text-slate-900'
-      }`}
+      className={`h-screen w-screen flex items-center justify-center p-4 ${isDark ? 'bg-[#080c16] text-white' : 'bg-slate-100 text-slate-900'
+        }`}
     >
       <div
-        className={`w-full max-w-md rounded-3xl border p-7 space-y-5 shadow-2xl ${
-          isDark ? 'bg-[#0c1222] border-white/10' : 'bg-white border-slate-200'
-        }`}
+        className={`w-full max-w-md rounded-3xl border p-7 space-y-5 shadow-2xl ${isDark ? 'bg-[#0c1222] border-white/10' : 'bg-white border-slate-200'
+          }`}
       >
         <div className="flex items-center gap-3">
           <img src="/assets/logo.png" alt="Webcraft" className="h-10 w-auto object-contain" />
@@ -301,9 +297,8 @@ function AdminGate({
 
         <Link
           to="/dashboard"
-          className={`inline-flex items-center gap-1.5 text-[11px] font-semibold ${
-            isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'
-          }`}
+          className={`inline-flex items-center gap-1.5 text-[11px] font-semibold ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'
+            }`}
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back to dashboard
@@ -620,7 +615,7 @@ export const AdminPage: React.FC = () => {
   }, [secret, activeNav, projectPage, projectSearch, loadProjects]);
 
   useEffect(() => {
-    if (!secret || activeNav !== 'analytics') return;
+    if (!secret || (activeNav !== 'analytics' && activeNav !== 'dashboard')) return;
     const timer = window.setTimeout(() => {
       void loadLeaderboard(leaderboardMonth);
     }, 150);
@@ -812,14 +807,12 @@ export const AdminPage: React.FC = () => {
 
   return (
     <div
-      className={`h-screen overflow-hidden flex ${
-        isDark ? 'bg-[#080c16] text-slate-100' : 'bg-slate-50 text-slate-900'
-      } font-sans`}
+      className={`h-screen overflow-hidden flex ${isDark ? 'bg-[#080c16] text-slate-100' : 'bg-slate-50 text-slate-900'
+        } font-sans`}
     >
       <aside
-        className={`w-64 shrink-0 flex flex-col justify-between border-r ${
-          isDark ? 'bg-[#0c1222] border-white/5' : 'bg-white border-slate-200'
-        } transition-all duration-200`}
+        className={`w-64 shrink-0 flex flex-col justify-between border-r ${isDark ? 'bg-[#0c1222] border-white/5' : 'bg-white border-slate-200'
+          } transition-all duration-200`}
       >
         <div>
           <div className="p-5 flex items-center gap-3 border-b border-white/5">
@@ -841,11 +834,10 @@ export const AdminPage: React.FC = () => {
               <button
                 key={item.id}
                 onClick={() => setActiveNav(item.id)}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                  activeNav === item.id
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${activeNav === item.id
                     ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-600/30'
                     : 'text-slate-400 hover:text-white hover:bg-white/5'
-                }`}
+                  }`}
               >
                 {item.icon}
                 <span>{item.label}</span>
@@ -884,11 +876,10 @@ export const AdminPage: React.FC = () => {
 
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         <header
-          className={`mt-3 mx-3 px-5 py-3 flex flex-wrap items-center justify-between gap-3 border rounded-2xl ${
-            isDark
+          className={`mt-3 mx-3 px-5 py-3 flex flex-wrap items-center justify-between gap-3 border rounded-2xl ${isDark
               ? 'bg-[#0c1222]/80 border-white/5 backdrop-blur-md'
               : 'bg-white/80 border-slate-200 backdrop-blur-md'
-          } sticky top-3 z-20`}
+            } sticky top-3 z-20`}
         >
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-2 text-[11px] font-semibold text-slate-400">
@@ -896,11 +887,10 @@ export const AdminPage: React.FC = () => {
               <span className="font-mono">{getBackendUrl()}</span>
             </div>
             <span
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold border ${
-                operational
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold border ${operational
                   ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
                   : 'bg-amber-500/10 border-amber-500/20 text-amber-400'
-              }`}
+                }`}
             >
               <Radio className="w-3 h-3" />
               {health ? (operational ? 'All Systems Operational' : 'Degraded') : 'Connecting…'}
@@ -1113,9 +1103,8 @@ export const AdminPage: React.FC = () => {
                     <div className="p-3 rounded-2xl bg-white/5">
                       <div className="text-[10px] uppercase font-bold text-slate-500">Database</div>
                       <div
-                        className={`text-lg font-black mt-0.5 ${
-                          databaseConnected ? 'text-emerald-400' : 'text-rose-400'
-                        }`}
+                        className={`text-lg font-black mt-0.5 ${databaseConnected ? 'text-emerald-400' : 'text-rose-400'
+                          }`}
                       >
                         {databaseConnected ? 'Online' : 'Offline'}
                       </div>
@@ -1123,9 +1112,8 @@ export const AdminPage: React.FC = () => {
                     <div className="p-3 rounded-2xl bg-white/5">
                       <div className="text-[10px] uppercase font-bold text-slate-500">Maintenance</div>
                       <div
-                        className={`text-lg font-black mt-0.5 ${
-                          settings.maintenanceMode ? 'text-amber-400' : 'text-emerald-400'
-                        }`}
+                        className={`text-lg font-black mt-0.5 ${settings.maintenanceMode ? 'text-amber-400' : 'text-emerald-400'
+                          }`}
                       >
                         {settings.maintenanceMode ? 'On' : 'Off'}
                       </div>
@@ -1248,6 +1236,171 @@ export const AdminPage: React.FC = () => {
                   </button>
                 </div>
               </div>
+
+              {/* Top 20 Creators (Per Month) Leaderboard & Visual Chart */}
+              <div className="p-6 rounded-3xl bg-[#0e1628] border border-white/5 space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/5">
+                  <div>
+                    <h2 className="text-base font-bold text-white flex items-center gap-2">
+                      <Trophy className="w-5 h-5 text-amber-400" />
+                      <span>Top 20 Creators Leaderboard</span>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/10 border border-amber-500/30 text-amber-300">
+                        {leaderboard?.monthLabel ?? leaderboardMonth}
+                      </span>
+                    </h2>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Ranked by most projects synthesized in MongoDB for the selected month.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="month"
+                      value={leaderboardMonth}
+                      max={new Date().toISOString().slice(0, 7)}
+                      onChange={(event) =>
+                        setLeaderboardMonth(event.target.value || new Date().toISOString().slice(0, 7))
+                      }
+                      className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                    <button
+                      onClick={() => void loadLeaderboard(leaderboardMonth)}
+                      className="p-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 cursor-pointer"
+                      title="Refresh creators"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${leaderboardLoading ? 'animate-spin' : ''}`} />
+                    </button>
+                    <button
+                      onClick={() => setActiveNav('analytics')}
+                      className="px-3 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-xs font-semibold text-purple-300 transition-colors"
+                    >
+                      Full Analytics →
+                    </button>
+                  </div>
+                </div>
+
+                {leaderboardLoading && !leaderboard ? (
+                  <div className="py-12 text-center space-y-2">
+                    <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto" />
+                    <p className="text-xs text-slate-500">Calculating creator stats from MongoDB...</p>
+                  </div>
+                ) : !leaderboard || leaderboard.topUsers.length === 0 ? (
+                  <div className="py-12 text-center space-y-2">
+                    <Trophy className="w-8 h-8 text-slate-600 mx-auto" />
+                    <p className="text-xs text-slate-400">No project creations recorded for {leaderboard?.monthLabel ?? leaderboardMonth} yet.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Top Creators Ranking List */}
+                    <div className="space-y-3 max-h-[480px] overflow-y-auto pr-2">
+                      {leaderboard.topUsers.map((user) => (
+                        <div
+                          key={`top-${user.rank}-${user.email}`}
+                          className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 transition-all flex items-center justify-between gap-3 group"
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            {/* Rank Badge */}
+                            <div
+                              className={`w-7 h-7 rounded-xl flex items-center justify-center text-xs font-black font-mono shrink-0 shadow-sm ${user.rank === 1
+                                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-amber-500/20'
+                                  : user.rank === 2
+                                    ? 'bg-slate-300/20 text-slate-200 border border-slate-300/40'
+                                    : user.rank === 3
+                                      ? 'bg-amber-700/20 text-amber-500 border border-amber-700/40'
+                                      : 'bg-white/5 text-slate-400 border border-white/5'
+                                }`}
+                            >
+                              {user.rank === 1 ? '🥇' : user.rank === 2 ? '🥈' : user.rank === 3 ? '🥉' : `#${user.rank}`}
+                            </div>
+
+                            {/* Avatar */}
+                            {user.avatar ? (
+                              <img src={user.avatar} alt={user.name} className="w-8 h-8 rounded-full object-cover shrink-0" />
+                            ) : (
+                              <div className="w-8 h-8 rounded-full bg-purple-500/20 border border-purple-500/20 text-purple-300 flex items-center justify-center text-[10px] font-bold shrink-0">
+                                {initials(user.name || user.email)}
+                              </div>
+                            )}
+
+                            {/* Name & Email */}
+                            <div className="min-w-0">
+                              <div className="font-bold text-white text-xs truncate group-hover:text-purple-300 transition-colors">
+                                {user.name || 'Unnamed Creator'}
+                              </div>
+                              <div className="text-[10px] text-slate-500 truncate font-mono">{user.email}</div>
+                            </div>
+                          </div>
+
+                          {/* Projects Count & Bar */}
+                          <div className="text-right shrink-0">
+                            <div className="text-xs font-bold text-cyan-400 font-mono">
+                              {formatNumber(user.projectsThisMonth)} <span className="text-[10px] text-slate-400 font-normal">this month</span>
+                            </div>
+                            <div className="w-24 h-1.5 rounded-full bg-white/5 overflow-hidden mt-1 ml-auto">
+                              <div
+                                className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-indigo-500"
+                                style={{
+                                  width: `${Math.max(8, Math.round((user.projectsThisMonth / maxMonthlyProjects) * 100))}%`,
+                                }}
+                              />
+                            </div>
+                            <div className="text-[9px] text-slate-500 mt-0.5">
+                              {formatNumber(user.totalProjects)} all-time
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Visual Project Volume Chart */}
+                    <div className="p-5 rounded-2xl bg-[#090f1d] border border-white/5 flex flex-col justify-between">
+                      <div className="flex items-center justify-between pb-3 border-b border-white/5">
+                        <div className="flex items-center gap-2 text-xs font-bold text-white">
+                          <TrendingUp className="w-4 h-4 text-cyan-400" />
+                          <span>Daily Creation Activity</span>
+                        </div>
+                        <span className="text-xs font-mono text-cyan-300 font-bold">
+                          {formatNumber(leaderboard.totalProjectsThisMonth)} projects total
+                        </span>
+                      </div>
+
+                      {/* Bar graph */}
+                      <div className="pt-6 pb-2">
+                        <div className="flex items-end gap-1 h-44">
+                          {leaderboard.daily.map((day) => (
+                            <div
+                              key={`chart-${day.date}`}
+                              className="flex-1 flex flex-col items-center justify-end h-full group relative cursor-pointer"
+                              title={`${day.date}: ${day.projects} project${day.projects === 1 ? '' : 's'}`}
+                            >
+                              <div
+                                className="w-full rounded-t bg-gradient-to-t from-indigo-600 via-purple-500 to-cyan-400 group-hover:brightness-125 transition-all shadow-[0_0_8px_rgba(99,102,241,0.2)]"
+                                style={{
+                                  height: `${day.projects === 0
+                                      ? 3
+                                      : Math.max(10, Math.round((day.projects / maxDailyProjects) * 100))
+                                    }%`,
+                                }}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                        <div className="flex justify-between text-[9px] font-mono text-slate-500 mt-2 px-1">
+                          <span>Day 1</span>
+                          <span>Day 15</span>
+                          <span>Day {leaderboard.daily.length}</span>
+                        </div>
+                      </div>
+
+                      {/* Summary Banner */}
+                      <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 text-xs text-purple-200 flex items-center justify-between">
+                        <span>Active Monthly Creators:</span>
+                        <span className="font-bold text-white font-mono">{formatNumber(leaderboard.activeCreatorsThisMonth)} users</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -1339,7 +1492,12 @@ export const AdminPage: React.FC = () => {
                             </div>
                           </td>
                           <td className="p-4 text-slate-300 font-mono">{user.email}</td>
-                          <td className="p-4 text-slate-200 font-semibold">{user.projectsCount} sites</td>
+                          <td className="p-4">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-300 font-bold font-mono text-xs">
+                              <FolderGit2 className="w-3.5 h-3.5 text-blue-400" />
+                              <span>{formatNumber(user.projectsCount)} {user.projectsCount === 1 ? 'project' : 'projects'}</span>
+                            </span>
+                          </td>
                           <td className="p-4 text-slate-400">{formatDate(user.joined)}</td>
                           <td className="p-4">
                             <StatusPill status={user.status} />
@@ -1643,11 +1801,10 @@ export const AdminPage: React.FC = () => {
                         <div
                           className="w-full rounded-t bg-gradient-to-t from-blue-600 to-purple-500 group-hover:from-blue-500 group-hover:to-purple-400 transition-colors"
                           style={{
-                            height: `${
-                              day.projects === 0
+                            height: `${day.projects === 0
                                 ? 2
                                 : Math.max(8, Math.round((day.projects / maxDailyProjects) * 100))
-                            }%`,
+                              }%`,
                           }}
                         />
                         <span className="text-[8px] text-slate-600">
@@ -2055,13 +2212,12 @@ export const AdminPage: React.FC = () => {
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                           <div className="flex items-center gap-2.5">
                             <span
-                              className={`w-2 h-2 rounded-full ${
-                                log.level === 'critical'
+                              className={`w-2 h-2 rounded-full ${log.level === 'critical'
                                   ? 'bg-rose-500 animate-ping'
                                   : log.level === 'error'
                                     ? 'bg-rose-400'
                                     : 'bg-amber-400'
-                              }`}
+                                }`}
                             />
                             <span className="text-xs font-bold text-white">{log.service}</span>
                             <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-md bg-white/10 text-slate-300">
@@ -2073,11 +2229,10 @@ export const AdminPage: React.FC = () => {
                               {formatRelative(log.timestamp)}
                             </span>
                             <span
-                              className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                                log.status === 'resolved'
+                              className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${log.status === 'resolved'
                                   ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                                   : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
-                              }`}
+                                }`}
                             >
                               {log.status === 'resolved' ? 'Resolved' : 'Needs Attention'}
                             </span>
