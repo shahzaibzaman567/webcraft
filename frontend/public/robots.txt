@@ -7,4 +7,4 @@ Disallow: /builder
 Disallow: /settings
 Disallow: /api/
 
-Sitemap: https://webcraft.app/sitemap.xml
+Sitemap: https://wabcraft.vercel.app/sitemap.xml

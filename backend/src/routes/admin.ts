@@ -34,6 +34,13 @@ const errorsQuerySchema = paginationSchema.extend({
 
 const idParamsSchema = z.object({ id: z.string().min(1).max(100) });
 
+const leaderboardQuerySchema = z.object({
+  month: z
+    .string()
+    .regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'Month must use YYYY-MM format')
+    .optional(),
+});
+
 const settingsSchema = z.object({
   maintenanceMode: z.boolean().optional(),
   adsEnabled: z.boolean().optional(),
@@ -60,6 +67,30 @@ function escapeRegex(value: string): string {
 
 function requestId(res: { locals: Record<string, unknown> }): string {
   return String(res.locals.requestId ?? '');
+}
+
+function monthRange(month?: string) {
+  const now = new Date();
+  const fallback = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}`;
+  const selected = month ?? fallback;
+  const [yearPart, monthPart] = selected.split('-');
+  const year = Number(yearPart);
+  const monthIndex = Number(monthPart) - 1;
+  const start = new Date(Date.UTC(year, monthIndex, 1));
+  const end = new Date(Date.UTC(year, monthIndex + 1, 1));
+  const daysInMonth = new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate();
+
+  return {
+    selected,
+    start,
+    end,
+    daysInMonth,
+    label: start.toLocaleString('en-US', {
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }),
+  };
 }
 
 router.get(
@@ -142,6 +173,95 @@ router.get(
             createdAt: project.createdAt,
           })),
         },
+      },
+      requestId: requestId(res),
+    });
+  }),
+);
+
+router.get(
+  '/leaderboard',
+  validateQuery(leaderboardQuerySchema),
+  asyncHandler(async (req, res) => {
+    const { month } = req.query as unknown as z.infer<typeof leaderboardQuerySchema>;
+    const range = monthRange(month);
+    const monthFilter = { createdAt: { $gte: range.start, $lt: range.end } };
+
+    const [monthlyGroups, dailyGroups] = await Promise.all([
+      Project.aggregate<{ _id: string; projectsThisMonth: number }>([
+        {
+          $match: {
+            ...monthFilter,
+            userEmail: { $type: 'string', $ne: '' },
+          },
+        },
+        {
+          $group: {
+            _id: { $toLower: '$userEmail' },
+            projectsThisMonth: { $sum: 1 },
+          },
+        },
+        { $sort: { projectsThisMonth: -1, _id: 1 } },
+      ]),
+      Project.aggregate<{ _id: string; projects: number }>([
+        { $match: monthFilter },
+        {
+          $group: {
+            _id: {
+              $dateToString: {
+                format: '%Y-%m-%d',
+                date: '$createdAt',
+                timezone: 'UTC',
+              },
+            },
+            projects: { $sum: 1 },
+          },
+        },
+      ]),
+    ]);
+
+    const topGroups = monthlyGroups.slice(0, 20);
+    const topEmails = topGroups.map((entry) => entry._id).filter(Boolean);
+    const users = topEmails.length
+      ? await User.find({ email: { $in: topEmails } })
+          .select('name email avatar role status projectsCount lastActive')
+          .lean()
+      : [];
+    const usersByEmail = new Map(users.map((user) => [user.email.toLowerCase(), user]));
+
+    const topUsers = topGroups.map((entry, index) => {
+      const user = usersByEmail.get(entry._id);
+      return {
+        rank: index + 1,
+        userId: user?._id.toString() ?? '',
+        name: user?.name ?? entry._id,
+        email: user?.email ?? entry._id,
+        avatar: user?.avatar ?? '',
+        role: user?.role ?? 'user',
+        status: user?.status ?? 'active',
+        projectsThisMonth: entry.projectsThisMonth,
+        totalProjects: user?.projectsCount ?? 0,
+        lastActive: user?.lastActive ?? null,
+      };
+    });
+
+    const dailyByDate = new Map(dailyGroups.map((entry) => [entry._id, entry.projects]));
+    const daily = Array.from({ length: range.daysInMonth }, (_, index) => {
+      const date = `${range.selected}-${String(index + 1).padStart(2, '0')}`;
+      return { date, projects: dailyByDate.get(date) ?? 0 };
+    });
+
+    res.json({
+      success: true,
+      data: {
+        month: range.selected,
+        monthLabel: range.label,
+        monthStart: range.start.toISOString(),
+        monthEnd: range.end.toISOString(),
+        totalProjectsThisMonth: dailyGroups.reduce((sum, entry) => sum + entry.projects, 0),
+        activeCreatorsThisMonth: monthlyGroups.length,
+        topUsers,
+        daily,
       },
       requestId: requestId(res),
     });

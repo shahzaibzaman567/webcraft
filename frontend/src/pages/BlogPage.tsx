@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Sparkles, Clock, Calendar, ArrowRight, Tag } from 'lucide-react';
 import { BLOG_POSTS } from '../data/landingData.ts';
+import { AdsterraBanner } from '../components/AdsterraBanner.tsx';
 
 export const BlogPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -179,6 +180,11 @@ export const BlogPage: React.FC = () => {
             ))}
           </div>
         )}
+
+        {/* Adsterra Sponsored Dev Tools Banner */}
+        <div className="pt-8">
+          <AdsterraBanner placement="docs" format="728x90" />
+        </div>
       </section>
     </div>
   );

@@ -56,6 +56,7 @@ import { usePublicSettings } from '../hooks/usePublicSettings';
 import { triggerPopunder } from '../lib/ads';
 import { getCurrentUser, updateLocalUser } from '../lib/auth';
 import { AdsterraBanner } from '../components/AdsterraBanner';
+import { WebcraftLoader } from '../components/WebcraftLoader';
 
 interface GeneratedFile {
   name: string;
@@ -720,11 +721,11 @@ export const BuilderPage: React.FC = () => {
           <span className="text-[11px] text-slate-500 hidden md:inline shrink-0">
             {projectUpdatedAt
               ? new Date(projectUpdatedAt).toLocaleString(undefined, {
-                  month: 'short',
-                  day: 'numeric',
-                  hour: 'numeric',
-                  minute: '2-digit',
-                })
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+              })
               : 'Unsaved draft'}
           </span>
 
@@ -1202,13 +1203,13 @@ export const BuilderPage: React.FC = () => {
               ))}
 
               {isGenerating && (
-                <div className="space-y-3">
-                  <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-3 text-xs text-blue-400">
-                    <div className="w-4 h-4 rounded-full border-2 border-blue-500 border-t-transparent animate-spin" />
-                    <span>Synthesizing changes &amp; regenerating preview...</span>
-                  </div>
-
-                  <AdsterraBanner placement="loading" />
+                <div className="py-2">
+                  <WebcraftLoader
+                    variant="generation"
+                    title="Synthesizing Live Changes"
+                    subtitle="Generating responsive code, wiring endpoints & updating live preview..."
+                    showAdSlot={true}
+                  />
                 </div>
               )}
 
@@ -1466,20 +1467,24 @@ export const BuilderPage: React.FC = () => {
             <div className="preview-stage flex-1 flex flex-col overflow-hidden bg-[#0a0c14]">
               <div key={previewKey} className={`flex-1 flex items-center justify-center overflow-auto ${standalonePreview ? 'p-0' : 'p-2 sm:p-4'}`}>
                 <div
-                  className={`h-full max-h-full rounded-2xl bg-[#07090e] text-white border border-white/10 shadow-2xl overflow-hidden transition-all duration-300 flex flex-col ${
-                    previewDevice === 'mobile'
+                  className={`h-full max-h-full rounded-2xl bg-[#07090e] text-white border border-white/10 shadow-2xl overflow-hidden transition-all duration-300 flex flex-col ${previewDevice === 'mobile'
                       ? 'w-[375px]'
                       : previewDevice === 'tablet'
                         ? 'w-[768px]'
                         : 'w-full'
-                  }`}
+                    }`}
                 >
                   {loadingProject || isGenerating ? (
-                    <div className="flex h-full flex-col items-center justify-center gap-3 text-slate-400">
-                      <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
-                      <p className="text-xs">
-                        {loadingProject ? 'Loading project...' : 'Generating project...'}
-                      </p>
+                    <div className="flex h-full w-full items-center justify-center p-6 bg-[#030615]">
+                      <WebcraftLoader
+                        variant="generation"
+                        title={loadingProject ? 'Loading Webcraft Project' : 'Synthesizing Live Preview'}
+                        subtitle={
+                          loadingProject
+                            ? 'Fetching files and configuration from database...'
+                            : 'Compiling React 19 components and Tailwind CSS styles...'
+                        }
+                      />
                     </div>
                   ) : previewDocument ? (
                     <iframe

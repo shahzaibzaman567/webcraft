@@ -18,6 +18,7 @@ import {
   Terminal,
 } from 'lucide-react';
 import { DOCS_TOPICS } from '../data/landingData.ts';
+import { AdsterraBanner } from '../components/AdsterraBanner.tsx';
 
 export const DocsPage: React.FC = () => {
   const { topic } = useParams<{ topic?: string }>();
@@ -181,6 +182,11 @@ export const DocsPage: React.FC = () => {
                 )}
               </div>
             ))}
+          </div>
+
+          {/* Adsterra Sponsored Developer Tools Banner */}
+          <div className="pt-8">
+            <AdsterraBanner placement="docs" format="728x90" />
           </div>
 
           {/* Pagination: Previous & Next Topic */}

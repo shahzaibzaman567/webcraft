@@ -34,6 +34,8 @@ import { NotFoundPage } from './pages/NotFoundPage.tsx';
 import { ConnectedServicesProvider } from './context/ConnectedServicesContext.tsx';
 import { ConnectServiceModal } from './components/ConnectServiceModal.tsx';
 import { ProjectCreationModal } from './components/ProjectCreationModal.tsx';
+import { WebcraftLoader } from './components/WebcraftLoader.tsx';
+import { AdsterraPopunder } from './components/AdsterraPopunder.tsx';
 
 // ─── Protected Route Wrapper (Auth Gate) ───
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -65,14 +67,16 @@ function AppLayout({ isDarkMode, toggleTheme }: { isDarkMode: boolean; toggleThe
   if (isFullScreen) {
     return (
       <div className="h-screen w-screen overflow-hidden bg-[#fafbfc] dark:bg-[#030619] text-slate-900 dark:text-slate-100 transition-colors duration-300">
-        <Routes>
-          <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-          <Route path="/dashboard/*" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-          <Route path="/builder" element={<ProtectedRoute><BuilderPage /></ProtectedRoute>} />
-          <Route path="/builder/*" element={<ProtectedRoute><BuilderPage /></ProtectedRoute>} />
-          <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
-          <Route path="/admin/*" element={<AdminRoute><AdminPage /></AdminRoute>} />
-        </Routes>
+        <React.Suspense fallback={<WebcraftLoader variant="fullscreen" />}>
+          <Routes>
+            <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+            <Route path="/dashboard/*" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+            <Route path="/builder" element={<ProtectedRoute><BuilderPage /></ProtectedRoute>} />
+            <Route path="/builder/*" element={<ProtectedRoute><BuilderPage /></ProtectedRoute>} />
+            <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
+            <Route path="/admin/*" element={<AdminRoute><AdminPage /></AdminRoute>} />
+          </Routes>
+        </React.Suspense>
         <ConnectServiceModal />
         <ProjectCreationModal />
       </div>
@@ -94,24 +98,26 @@ function AppLayout({ isDarkMode, toggleTheme }: { isDarkMode: boolean; toggleThe
 
         {/* Dedicated Page Routes */}
         <main className="flex-1">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/pricing" element={<PricingPage />} />
-            <Route path="/security" element={<SecurityPage />} />
-            <Route path="/enterprise" element={<EnterprisePage />} />
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/blog/:slug" element={<BlogPostPage />} />
-            <Route path="/docs" element={<DocsPage />} />
-            <Route path="/docs/:topic" element={<DocsPage />} />
-            <Route path="/guides" element={<GuidesPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/signup" element={<SignUpPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/integrations" element={<IntegrationsPage />} />
-            <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
+          <React.Suspense fallback={<WebcraftLoader variant="fullscreen" />}>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/pricing" element={<PricingPage />} />
+              <Route path="/security" element={<SecurityPage />} />
+              <Route path="/enterprise" element={<EnterprisePage />} />
+              <Route path="/blog" element={<BlogPage />} />
+              <Route path="/blog/:slug" element={<BlogPostPage />} />
+              <Route path="/docs" element={<DocsPage />} />
+              <Route path="/docs/:topic" element={<DocsPage />} />
+              <Route path="/guides" element={<GuidesPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/signup" element={<SignUpPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/integrations" element={<IntegrationsPage />} />
+              <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </React.Suspense>
         </main>
 
         {/* Universal Footer */}
@@ -168,6 +174,7 @@ export default function App() {
     <BrowserRouter>
       <ConnectedServicesProvider>
         <ScrollToTop />
+        <AdsterraPopunder />
         <AppLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
       </ConnectedServicesProvider>
     </BrowserRouter>

@@ -56,6 +56,35 @@ export interface AdminOverview {
   };
 }
 
+export interface AdminLeaderboardUser {
+  rank: number;
+  userId: string;
+  name: string;
+  email: string;
+  avatar: string;
+  role: string;
+  status: 'active' | 'suspended';
+  projectsThisMonth: number;
+  totalProjects: number;
+  lastActive: string | null;
+}
+
+export interface AdminLeaderboardDay {
+  date: string;
+  projects: number;
+}
+
+export interface AdminLeaderboard {
+  month: string;
+  monthLabel: string;
+  monthStart: string;
+  monthEnd: string;
+  totalProjectsThisMonth: number;
+  activeCreatorsThisMonth: number;
+  topUsers: AdminLeaderboardUser[];
+  daily: AdminLeaderboardDay[];
+}
+
 export interface AdminUser {
   id: string;
   name: string;
@@ -220,6 +249,13 @@ export async function getHealth(): Promise<HealthInfo> {
 
 export async function getOverview(): Promise<AdminOverview> {
   const payload = await request<{ data: AdminOverview }>('/api/admin/overview');
+  return payload.data;
+}
+
+export async function getLeaderboard(month?: string): Promise<AdminLeaderboard> {
+  const payload = await request<{ data: AdminLeaderboard }>(
+    `/api/admin/leaderboard${query({ month })}`,
+  );
   return payload.data;
 }
 

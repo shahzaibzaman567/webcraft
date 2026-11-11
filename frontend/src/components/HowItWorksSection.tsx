@@ -8,7 +8,7 @@ export const HowItWorksSection: React.FC = () => {
       num: '01',
       gradient: 'from-blue-500 to-indigo-600',
       icon: <MessageSquare className="w-6 h-6 text-blue-500 dark:text-cyan-400" />,
-      title: 'Describe your landing page in plain English',
+      title: 'Describe your project page in plain English',
       desc: 'Specify your product, preferred sections, color palette, and target audience in natural conversational language.'
     },
     {

@@ -168,23 +168,21 @@ export const ConnectServicesSection: React.FC = () => {
                     ) : (
                       <>
                         <Lock className="w-3.5 h-3.5" />
-                        <span>Sign in to connect</span>
+                        <span>Create account to connect</span>
                       </>
                     )}
                   </button>
 
                   {!isLoggedIn && (
-                    <p className="flex items-center justify-center gap-1 text-[11px] text-slate-500 dark:text-slate-400">
-                      <LogIn className="w-3 h-3" />
-                      <span>Create your account first.</span>
-                      <Link to="/login?redirect=/" className="font-semibold text-blue-600 dark:text-cyan-400 hover:underline">
-                        Sign in
+                    <div className="text-center">
+                      <Link
+                        to="/signup"
+                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 dark:text-cyan-400 hover:underline"
+                      >
+                        <LogIn className="w-3 h-3" />
+                        <span>Create account</span>
                       </Link>
-                      <span>/</span>
-                      <Link to="/signup" className="font-semibold text-blue-600 dark:text-cyan-400 hover:underline">
-                        Sign up
-                      </Link>
-                    </p>
+                    </div>
                   )}
 
                   <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 px-1">

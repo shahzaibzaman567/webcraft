@@ -1,0 +1,9 @@
+{
+  "name": "webcraft-workspace",
+  "private": true,
+  "scripts": {
+    "build": "npm --prefix frontend run build",
+    "start": "npm --prefix backend run start"
+  }
+}
+

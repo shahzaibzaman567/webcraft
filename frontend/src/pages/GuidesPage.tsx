@@ -12,6 +12,7 @@ import {
   Check,
 } from 'lucide-react';
 import { GUIDES_DATA } from '../data/landingData.ts';
+import { AdsterraBanner } from '../components/AdsterraBanner.tsx';
 
 export const GuidesPage: React.FC = () => {
   const [selectedGuideId, setSelectedGuideId] = useState<string>(GUIDES_DATA[0].id);
@@ -157,6 +158,10 @@ export const GuidesPage: React.FC = () => {
                   </div>
                 </div>
               ))}
+            </div>
+
+            <div className="pt-6">
+              <AdsterraBanner placement="docs" format="728x90" />
             </div>
 
             <div className="pt-8 border-t border-slate-100 dark:border-white/10 flex flex-wrap items-center justify-between gap-4">

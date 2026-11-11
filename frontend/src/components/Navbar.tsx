@@ -167,13 +167,13 @@ export const Navbar: React.FC<NavbarProps> = ({ isDarkMode, onToggleTheme }) => 
     },
     {
       title: 'Contact & Support',
-      description: 'Direct inquiry line with the Webcarft founder team',
+      description: 'Direct inquiry line with the Webcraft founder team',
       href: '/contact',
       icon: MessageSquare,
       color: 'text-purple-400',
     },
     {
-      title: 'About Webcarft',
+      title: 'About Webcraft',
       description: 'Meet founder Shahzaib Zaman and our mission',
       href: '/about',
       icon: Compass,
@@ -202,11 +202,11 @@ export const Navbar: React.FC<NavbarProps> = ({ isDarkMode, onToggleTheme }) => 
           >
             <img
               src="/assets/logo.png"
-              alt="Webcarft Logo"
+              alt="Webcraft Logo"
               className="h-7 sm:h-8 w-auto object-contain filter drop-shadow-[0_0_8px_rgba(59,130,246,0.6)] group-hover:scale-105 transition-transform"
             />
             <span className="text-base sm:text-lg font-bold tracking-tight text-slate-900 dark:text-white flex items-center">
-              Webcarft
+              Webcraft
             </span>
           </Link>
 
@@ -220,17 +220,15 @@ export const Navbar: React.FC<NavbarProps> = ({ isDarkMode, onToggleTheme }) => 
             >
               <button
                 type="button"
-                className={`text-xs sm:text-sm font-medium transition-colors flex items-center gap-1 cursor-pointer py-1 ${
-                  openDropdown === 'solutions' || location.pathname.startsWith('/docs')
+                className={`text-xs sm:text-sm font-medium transition-colors flex items-center gap-1 cursor-pointer py-1 ${openDropdown === 'solutions' || location.pathname.startsWith('/docs')
                     ? 'text-blue-600 dark:text-cyan-400'
                     : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-                }`}
+                  }`}
               >
                 <span>Solutions</span>
                 <ChevronDown
-                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                    openDropdown === 'solutions' ? 'rotate-180' : ''
-                  }`}
+                  className={`w-3.5 h-3.5 transition-transform duration-200 ${openDropdown === 'solutions' ? 'rotate-180' : ''
+                    }`}
                 />
               </button>
 
@@ -266,19 +264,17 @@ export const Navbar: React.FC<NavbarProps> = ({ isDarkMode, onToggleTheme }) => 
             >
               <button
                 type="button"
-                className={`text-xs sm:text-sm font-medium transition-colors flex items-center gap-1 cursor-pointer py-1 ${
-                  openDropdown === 'resources' ||
-                  location.pathname.startsWith('/blog') ||
-                  location.pathname.startsWith('/guides')
+                className={`text-xs sm:text-sm font-medium transition-colors flex items-center gap-1 cursor-pointer py-1 ${openDropdown === 'resources' ||
+                    location.pathname.startsWith('/blog') ||
+                    location.pathname.startsWith('/guides')
                     ? 'text-blue-600 dark:text-cyan-400'
                     : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-                }`}
+                  }`}
               >
                 <span>Resources</span>
                 <ChevronDown
-                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                    openDropdown === 'resources' ? 'rotate-180' : ''
-                  }`}
+                  className={`w-3.5 h-3.5 transition-transform duration-200 ${openDropdown === 'resources' ? 'rotate-180' : ''
+                    }`}
                 />
               </button>
 
@@ -314,17 +310,15 @@ export const Navbar: React.FC<NavbarProps> = ({ isDarkMode, onToggleTheme }) => 
             >
               <button
                 type="button"
-                className={`text-xs sm:text-sm font-medium transition-colors flex items-center gap-1 cursor-pointer py-1 ${
-                  openDropdown === 'community'
+                className={`text-xs sm:text-sm font-medium transition-colors flex items-center gap-1 cursor-pointer py-1 ${openDropdown === 'community'
                     ? 'text-blue-600 dark:text-cyan-400'
                     : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-                }`}
+                  }`}
               >
                 <span>Community</span>
                 <ChevronDown
-                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                    openDropdown === 'community' ? 'rotate-180' : ''
-                  }`}
+                  className={`w-3.5 h-3.5 transition-transform duration-200 ${openDropdown === 'community' ? 'rotate-180' : ''
+                    }`}
                 />
               </button>
 
@@ -375,33 +369,30 @@ export const Navbar: React.FC<NavbarProps> = ({ isDarkMode, onToggleTheme }) => 
 
             <Link
               to="/enterprise"
-              className={`text-xs sm:text-sm font-medium transition-colors py-1 ${
-                isActive('/enterprise')
+              className={`text-xs sm:text-sm font-medium transition-colors py-1 ${isActive('/enterprise')
                   ? 'text-blue-600 dark:text-cyan-400'
                   : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-              }`}
+                }`}
             >
               Enterprise
             </Link>
 
             <Link
               to="/pricing"
-              className={`text-xs sm:text-sm font-medium transition-colors py-1 ${
-                isActive('/pricing')
+              className={`text-xs sm:text-sm font-medium transition-colors py-1 ${isActive('/pricing')
                   ? 'text-blue-600 dark:text-cyan-400'
                   : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-              }`}
+                }`}
             >
               Pricing
             </Link>
 
             <Link
               to="/security"
-              className={`text-xs sm:text-sm font-medium transition-colors py-1 ${
-                isActive('/security')
+              className={`text-xs sm:text-sm font-medium transition-colors py-1 ${isActive('/security')
                   ? 'text-blue-600 dark:text-cyan-400'
                   : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-              }`}
+                }`}
             >
               Security
             </Link>
@@ -424,13 +415,13 @@ export const Navbar: React.FC<NavbarProps> = ({ isDarkMode, onToggleTheme }) => 
               )}
             </button>
 
-            {/* If Logged In: Show 'Open Webcarft' (Matching Image 3 of Lovable) */}
+            {/* If Logged In: Show 'Open Webcraft' (Matching Image 3 of Lovable) */}
             {isLoggedIn ? (
               <Link
                 to="/dashboard"
                 className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold text-white bg-slate-950 dark:bg-white dark:text-slate-950 hover:bg-slate-800 dark:hover:bg-slate-100 shadow-md transition-all duration-200 flex items-center gap-1.5 cursor-pointer whitespace-nowrap active:scale-95"
               >
-                <span>Open Webcarft</span>
+                <span>Open Webcraft</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             ) : (
@@ -491,11 +482,11 @@ export const Navbar: React.FC<NavbarProps> = ({ isDarkMode, onToggleTheme }) => 
                 >
                   <img
                     src="/assets/logo.png"
-                    alt="Webcarft Logo"
+                    alt="Webcraft Logo"
                     className="h-7 w-auto object-contain filter drop-shadow-[0_0_6px_rgba(59,130,246,0.5)]"
                   />
                   <span className="text-lg font-bold text-slate-900 dark:text-white">
-                    Webcarft
+                    Webcraft
                   </span>
                 </Link>
                 <button
@@ -518,22 +509,20 @@ export const Navbar: React.FC<NavbarProps> = ({ isDarkMode, onToggleTheme }) => 
                     <Link
                       to="/"
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                        isActive('/')
+                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${isActive('/')
                           ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-cyan-400 font-semibold'
                           : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
-                      }`}
+                        }`}
                     >
                       Home
                     </Link>
                     <Link
                       to="/builder"
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`py-2 px-3 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 ${
-                        isActive('/builder')
+                      className={`py-2 px-3 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 ${isActive('/builder')
                           ? 'bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 font-bold'
                           : 'text-purple-600 dark:text-purple-400 hover:bg-slate-100 dark:hover:bg-white/5'
-                      }`}
+                        }`}
                     >
                       <Sparkles className="w-4 h-4" />
                       <span>AI Builder Studio</span>
@@ -541,88 +530,80 @@ export const Navbar: React.FC<NavbarProps> = ({ isDarkMode, onToggleTheme }) => 
                     <Link
                       to="/dashboard"
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                        isActive('/dashboard')
+                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${isActive('/dashboard')
                           ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-cyan-400 font-semibold'
                           : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
-                      }`}
+                        }`}
                     >
                       Developer Dashboard
                     </Link>
                     <Link
                       to="/integrations"
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                        isActive('/integrations')
+                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${isActive('/integrations')
                           ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-cyan-400 font-semibold'
                           : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
-                      }`}
+                        }`}
                     >
                       Integrations &amp; Cloud
                     </Link>
                     <Link
                       to="/settings"
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                        isActive('/settings')
+                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${isActive('/settings')
                           ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-cyan-400 font-semibold'
                           : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
-                      }`}
+                        }`}
                     >
                       Connect Services
                     </Link>
                     <Link
                       to="/about"
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                        isActive('/about')
+                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${isActive('/about')
                           ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-cyan-400 font-semibold'
                           : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
-                      }`}
+                        }`}
                     >
                       About &amp; Founder
                     </Link>
                     <Link
                       to="/pricing"
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                        isActive('/pricing')
+                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${isActive('/pricing')
                           ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-cyan-400 font-semibold'
                           : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
-                      }`}
+                        }`}
                     >
                       Pricing ($0 Free Plan)
                     </Link>
                     <Link
                       to="/security"
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                        isActive('/security')
+                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${isActive('/security')
                           ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-cyan-400 font-semibold'
                           : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
-                      }`}
+                        }`}
                     >
                       Security &amp; Trust
                     </Link>
                     <Link
                       to="/enterprise"
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                        isActive('/enterprise')
+                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${isActive('/enterprise')
                           ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-cyan-400 font-semibold'
                           : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
-                      }`}
+                        }`}
                     >
                       Enterprise
                     </Link>
                     <Link
                       to="/contact"
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                        isActive('/contact')
+                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${isActive('/contact')
                           ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-cyan-400 font-semibold'
                           : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
-                      }`}
+                        }`}
                     >
                       Contact Us
                     </Link>
@@ -637,33 +618,30 @@ export const Navbar: React.FC<NavbarProps> = ({ isDarkMode, onToggleTheme }) => 
                     <Link
                       to="/docs"
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                        isActive('/docs')
+                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${isActive('/docs')
                           ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-cyan-400 font-semibold'
                           : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
-                      }`}
+                        }`}
                     >
                       Documentation Portal
                     </Link>
                     <Link
                       to="/guides"
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                        isActive('/guides')
+                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${isActive('/guides')
                           ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-cyan-400 font-semibold'
                           : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
-                      }`}
+                        }`}
                     >
                       Guides &amp; Tutorials
                     </Link>
                     <Link
                       to="/blog"
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                        isActive('/blog')
+                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${isActive('/blog')
                           ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-cyan-400 font-semibold'
                           : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
-                      }`}
+                        }`}
                     >
                       Blog &amp; Articles
                     </Link>

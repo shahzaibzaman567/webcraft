@@ -40,7 +40,15 @@ export function createApp(): Express {
   app.use(
     cors({
       origin: (origin, callback) => {
-        if (!origin || origin === env.frontendUrl) {
+        const allowedOrigins = [
+          env.frontendUrl,
+          'https://wabcraft.vercel.app',
+          'http://localhost:3000',
+          'http://localhost:5173',
+          'http://localhost:5174',
+        ].filter(Boolean);
+
+        if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
           callback(null, true);
           return;
         }

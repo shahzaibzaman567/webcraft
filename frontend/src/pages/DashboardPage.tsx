@@ -30,6 +30,7 @@ import { getCurrentUser, logout, isSuperAdmin, updateLocalUser, type WebcraftUse
 import { triggerPopunder } from '../lib/ads';
 import { usePublicSettings } from '../hooks/usePublicSettings';
 import { getMe, getProjects, type ApiProjectSummary } from '../lib/userApi';
+import { WebcraftLoader } from '../components/WebcraftLoader';
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
@@ -155,9 +156,8 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div
-      className={`flex h-screen w-screen overflow-hidden font-sans select-none transition-colors duration-300 ${
-        isDark ? 'bg-[#07090e] text-slate-100' : 'bg-[#f4f6fb] text-slate-900'
-      }`}
+      className={`flex h-screen w-screen overflow-hidden font-sans select-none transition-colors duration-300 ${isDark ? 'bg-[#07090e] text-slate-100' : 'bg-[#f4f6fb] text-slate-900'
+        }`}
     >
       {/* ─── LEFT SIDEBAR (Clean Lovable style) ─── */}
       <aside className="w-64 shrink-0 bg-[#0a0d14] border-r border-white/10 flex flex-col h-full overflow-hidden z-20">
@@ -266,9 +266,8 @@ export const DashboardPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setActiveTab('mine')}
-              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
-                activeTab === 'mine' ? 'text-white bg-white/10' : 'text-slate-400 hover:text-white hover:bg-white/5'
-              }`}
+              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${activeTab === 'mine' ? 'text-white bg-white/10' : 'text-slate-400 hover:text-white hover:bg-white/5'
+                }`}
             >
               <Layers className="w-4 h-4 text-purple-400" />
               <span>My Projects ({projects.length})</span>
@@ -412,9 +411,8 @@ export const DashboardPage: React.FC = () => {
                             setSelectedFramework(fw);
                             setShowFrameworkDropdown(false);
                           }}
-                          className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold uppercase ${
-                            selectedFramework === fw ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-white/5'
-                          }`}
+                          className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold uppercase ${selectedFramework === fw ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-white/5'
+                            }`}
                         >
                           {fw}
                         </button>
@@ -427,11 +425,10 @@ export const DashboardPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={toggleSpeechRecognition}
-                  className={`p-2 rounded-lg transition-colors cursor-pointer ${
-                    isListening
+                  className={`p-2 rounded-lg transition-colors cursor-pointer ${isListening
                       ? 'bg-rose-500 text-white animate-pulse'
                       : 'text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10'
-                  }`}
+                    }`}
                   title={isListening ? 'Listening... Click to stop' : 'Click to speak your prompt'}
                 >
                   <Mic className="w-4 h-4" />
@@ -469,11 +466,10 @@ export const DashboardPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setActiveTab('mine')}
-                  className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                    activeTab === 'mine'
+                  className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${activeTab === 'mine'
                       ? 'bg-slate-900 text-white dark:bg-white dark:text-black shadow-sm'
                       : 'text-slate-600 dark:text-slate-400 hover:text-black dark:hover:text-white'
-                  }`}
+                    }`}
                 >
                   My projects ({projects.length})
                 </button>
@@ -481,11 +477,10 @@ export const DashboardPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setActiveTab('recent')}
-                  className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                    activeTab === 'recent'
+                  className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${activeTab === 'recent'
                       ? 'bg-slate-900 text-white dark:bg-white dark:text-black shadow-sm'
                       : 'text-slate-600 dark:text-slate-400 hover:text-black dark:hover:text-white'
-                  }`}
+                    }`}
                 >
                   Recently viewed
                 </button>
@@ -493,11 +488,10 @@ export const DashboardPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setActiveTab('templates')}
-                  className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                    activeTab === 'templates'
+                  className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${activeTab === 'templates'
                       ? 'bg-slate-900 text-white dark:bg-white dark:text-black shadow-sm'
                       : 'text-slate-600 dark:text-slate-400 hover:text-black dark:hover:text-white'
-                  }`}
+                    }`}
                 >
                   Templates
                 </button>
@@ -516,9 +510,12 @@ export const DashboardPage: React.FC = () => {
 
             {/* Live Real Projects Grid (No Dummy Data) */}
             {loadingProjects ? (
-              <div className="py-16 text-center space-y-3">
-                <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-xs text-slate-400">Loading your projects from database...</p>
+              <div className="py-12 flex justify-center">
+                <WebcraftLoader
+                  variant="generation"
+                  title="Syncing Live Workspace"
+                  subtitle="Connecting to Supabase Postgres & IndexedDB cache..."
+                />
               </div>
             ) : filteredProjects.length === 0 ? (
               /* Clean Empty State (When no projects exist yet) */

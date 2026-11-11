@@ -16,6 +16,7 @@ import {
   Moon,
   ChevronDown,
   TrendingUp,
+  Trophy,
   Plus,
   Trash2,
   CheckCircle2,
@@ -40,6 +41,7 @@ import {
 import {
   AdminApiError,
   AdminErrorLog,
+  AdminLeaderboard,
   AdminOverview,
   AdminProject,
   AdminSettings,
@@ -56,6 +58,7 @@ import {
   getErrors,
   getHealth,
   getKeys,
+  getLeaderboard,
   getOverview,
   getProjects,
   getSettings,
@@ -330,6 +333,12 @@ export const AdminPage: React.FC = () => {
   const [overview, setOverview] = useState<AdminOverview | null>(null);
   const [overviewLoading, setOverviewLoading] = useState(false);
 
+  const [leaderboard, setLeaderboard] = useState<AdminLeaderboard | null>(null);
+  const [leaderboardLoading, setLeaderboardLoading] = useState(false);
+  const [leaderboardMonth, setLeaderboardMonth] = useState(() =>
+    new Date().toISOString().slice(0, 7),
+  );
+
   const [health, setHealth] = useState<HealthInfo | null>(null);
 
   const [keys, setKeys] = useState<ApiKeyRow[]>([]);
@@ -412,6 +421,7 @@ export const AdminPage: React.FC = () => {
     setSecret('');
     setAuthError('');
     setOverview(null);
+    setLeaderboard(null);
     setKeys([]);
     setKeyStats(null);
     setUserList([]);
@@ -428,6 +438,20 @@ export const AdminPage: React.FC = () => {
         handleApiError(error, 'Could not load overview');
       } finally {
         if (!silent) setOverviewLoading(false);
+      }
+    },
+    [handleApiError],
+  );
+
+  const loadLeaderboard = useCallback(
+    async (month: string, silent = false) => {
+      if (!silent) setLeaderboardLoading(true);
+      try {
+        setLeaderboard(await getLeaderboard(month));
+      } catch (error) {
+        handleApiError(error, 'Could not load user leaderboard');
+      } finally {
+        if (!silent) setLeaderboardLoading(false);
       }
     },
     [handleApiError],
@@ -560,9 +584,24 @@ export const AdminPage: React.FC = () => {
       if (activeNav === 'errors') {
         void loadErrors(errorPage, errorSearch, errorStatus, true);
       }
+      if (activeNav === 'analytics') {
+        void loadLeaderboard(leaderboardMonth, true);
+      }
     }, 30_000);
     return () => window.clearInterval(timer);
-  }, [secret, activeNav, errorPage, errorSearch, errorStatus, loadOverview, loadHealth, loadKeys, loadErrors]);
+  }, [
+    secret,
+    activeNav,
+    errorPage,
+    errorSearch,
+    errorStatus,
+    leaderboardMonth,
+    loadOverview,
+    loadHealth,
+    loadKeys,
+    loadErrors,
+    loadLeaderboard,
+  ]);
 
   useEffect(() => {
     if (!secret || activeNav !== 'users') return;
@@ -579,6 +618,14 @@ export const AdminPage: React.FC = () => {
     }, 250);
     return () => window.clearTimeout(timer);
   }, [secret, activeNav, projectPage, projectSearch, loadProjects]);
+
+  useEffect(() => {
+    if (!secret || activeNav !== 'analytics') return;
+    const timer = window.setTimeout(() => {
+      void loadLeaderboard(leaderboardMonth);
+    }, 150);
+    return () => window.clearTimeout(timer);
+  }, [secret, activeNav, leaderboardMonth, loadLeaderboard]);
 
   useEffect(() => {
     if (!secret || activeNav !== 'errors') return;
@@ -703,6 +750,14 @@ export const AdminPage: React.FC = () => {
 
   const providers = overview?.keyPoolStats ?? keyStats?.providers ?? [];
   const maxProviderRequests = Math.max(1, ...providers.map((provider) => provider.requestsToday));
+  const maxMonthlyProjects = Math.max(
+    1,
+    ...(leaderboard?.topUsers.map((user) => user.projectsThisMonth) ?? []),
+  );
+  const maxDailyProjects = Math.max(
+    1,
+    ...(leaderboard?.daily.map((day) => day.projects) ?? []),
+  );
   const unresolvedCount = overview?.unresolvedErrors ?? 0;
   const databaseConnected = health?.database === 'connected';
   const operational = health?.status === 'operational';
@@ -1378,13 +1433,68 @@ export const AdminPage: React.FC = () => {
 
           {activeNav === 'analytics' && (
             <div className="space-y-6 animate-in fade-in duration-200">
-              <div>
-                <h1 className="text-xl font-black text-white">Live Usage Analytics</h1>
-                <p className="text-xs text-slate-400">
-                  Aggregated from MongoDB collections and the AI key pool. Historical charts appear as data
-                  accumulates.
-                </p>
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                <div>
+                  <h1 className="text-xl font-black text-white">Live Usage Analytics</h1>
+                  <p className="text-xs text-slate-400">
+                    Top 20 users by projects created in the selected month, plus daily project activity
+                    from MongoDB.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="month"
+                    value={leaderboardMonth}
+                    max={new Date().toISOString().slice(0, 7)}
+                    onChange={(event) =>
+                      setLeaderboardMonth(
+                        event.target.value || new Date().toISOString().slice(0, 7),
+                      )
+                    }
+                    className="px-3 py-1.5 rounded-xl bg-[#0e1628] border border-white/10 text-xs text-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  />
+                  <button
+                    onClick={() => void loadLeaderboard(leaderboardMonth)}
+                    className="p-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 cursor-pointer"
+                    title="Refresh leaderboard"
+                  >
+                    <RefreshCw
+                      className={`w-3.5 h-3.5 ${leaderboardLoading ? 'animate-spin' : ''}`}
+                    />
+                  </button>
+                </div>
               </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="p-4 rounded-2xl bg-[#0e1628] border border-white/5">
+                  <div className="text-[10px] uppercase tracking-wider font-bold text-slate-500">
+                    Projects this month
+                  </div>
+                  <div className="mt-1 text-2xl font-black text-white">
+                    {formatNumber(leaderboard?.totalProjectsThisMonth)}
+                  </div>
+                </div>
+                <div className="p-4 rounded-2xl bg-[#0e1628] border border-white/5">
+                  <div className="text-[10px] uppercase tracking-wider font-bold text-slate-500">
+                    Active creators
+                  </div>
+                  <div className="mt-1 text-2xl font-black text-white">
+                    {formatNumber(leaderboard?.activeCreatorsThisMonth)}
+                  </div>
+                </div>
+                <div className="p-4 rounded-2xl bg-[#0e1628] border border-white/5">
+                  <div className="text-[10px] uppercase tracking-wider font-bold text-slate-500">
+                    Top creator
+                  </div>
+                  <div className="mt-1 text-sm font-bold text-white truncate">
+                    {leaderboard?.topUsers[0]?.name || '—'}
+                  </div>
+                  <div className="text-[10px] text-slate-500 truncate">
+                    {leaderboard?.topUsers[0]?.email || 'No projects this month'}
+                  </div>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="p-6 rounded-3xl bg-[#0e1628] border border-white/5 space-y-4">
                   <h3 className="text-sm font-bold text-white flex items-center gap-2">
@@ -1444,6 +1554,109 @@ export const AdminPage: React.FC = () => {
                     </div>
                   </div>
                 </div>
+              </div>
+
+              <div className="p-6 rounded-3xl bg-[#0e1628] border border-white/5 space-y-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                    <Trophy className="w-4 h-4 text-amber-400" />
+                    <span>Top 20 Users · {leaderboard?.monthLabel ?? 'Selected month'}</span>
+                  </h3>
+                  <span className="text-[10px] text-slate-500">
+                    Monthly projects / all-time projects
+                  </span>
+                </div>
+
+                {leaderboardLoading && !leaderboard ? (
+                  <p className="text-xs text-slate-500">Loading leaderboard…</p>
+                ) : !leaderboard || leaderboard.topUsers.length === 0 ? (
+                  <p className="text-xs text-slate-500">
+                    No projects were created in this month yet.
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {leaderboard.topUsers.map((user) => (
+                      <div key={`${user.rank}-${user.email}`} className="flex items-start gap-3">
+                        <span className="w-7 shrink-0 text-[11px] font-bold text-slate-500 font-mono pt-0.5">
+                          #{user.rank}
+                        </span>
+                        {user.avatar ? (
+                          <img
+                            src={user.avatar}
+                            alt={user.name}
+                            className="w-7 h-7 rounded-full object-cover shrink-0"
+                          />
+                        ) : (
+                          <div className="w-7 h-7 rounded-full bg-purple-500/20 border border-purple-500/20 text-purple-300 flex items-center justify-center text-[9px] font-bold shrink-0">
+                            {initials(user.name || user.email)}
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-3 text-xs mb-1">
+                            <span className="truncate font-semibold text-slate-200">
+                              {user.name || user.email}
+                            </span>
+                            <span className="font-mono text-slate-300 whitespace-nowrap">
+                              {formatNumber(user.projectsThisMonth)}
+                              <span className="text-slate-500"> / {formatNumber(user.totalProjects)}</span>
+                            </span>
+                          </div>
+                          <div className="w-full h-2 rounded-full bg-white/5 overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-gradient-to-r from-purple-500 to-indigo-500"
+                              style={{
+                                width: `${Math.max(
+                                  4,
+                                  Math.round((user.projectsThisMonth / maxMonthlyProjects) * 100),
+                                )}%`,
+                              }}
+                            />
+                          </div>
+                          <div className="mt-1 text-[10px] text-slate-500 truncate">{user.email}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="p-6 rounded-3xl bg-[#0e1628] border border-white/5 space-y-4">
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-blue-400" />
+                    <span>Daily Project Creations · {leaderboard?.monthLabel ?? 'Selected month'}</span>
+                  </h3>
+                  <span className="text-[10px] text-slate-500">
+                    {formatNumber(leaderboard?.totalProjectsThisMonth)} total
+                  </span>
+                </div>
+                {!leaderboard || leaderboard.daily.every((day) => day.projects === 0) ? (
+                  <p className="text-xs text-slate-500">No daily project activity for this month.</p>
+                ) : (
+                  <div className="flex items-end gap-1 h-32">
+                    {leaderboard.daily.map((day) => (
+                      <div
+                        key={day.date}
+                        className="flex-1 flex flex-col items-center justify-end gap-1 h-full group"
+                        title={`${day.date}: ${day.projects} project${day.projects === 1 ? '' : 's'}`}
+                      >
+                        <div
+                          className="w-full rounded-t bg-gradient-to-t from-blue-600 to-purple-500 group-hover:from-blue-500 group-hover:to-purple-400 transition-colors"
+                          style={{
+                            height: `${
+                              day.projects === 0
+                                ? 2
+                                : Math.max(8, Math.round((day.projects / maxDailyProjects) * 100))
+                            }%`,
+                          }}
+                        />
+                        <span className="text-[8px] text-slate-600">
+                          {Number(day.date.slice(-2))}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}

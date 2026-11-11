@@ -161,3 +161,39 @@
 .glow-purple {
   box-shadow: 0 0 35px -5px rgba(168, 85, 247, 0.35);
 }
+
+/* Webcraft Signature Loader Animations */
+@keyframes progress {
+  0% {
+    left: -40%;
+    width: 30%;
+  }
+  50% {
+    left: 30%;
+    width: 60%;
+  }
+  100% {
+    left: 100%;
+    width: 30%;
+  }
+}
+
+@keyframes spin-reverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+/* Tech Stack Marquee — Infinite horizontal scroll */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+

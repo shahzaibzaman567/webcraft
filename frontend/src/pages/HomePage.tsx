@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { HeroSection } from '../components/HeroSection.tsx';
+import { TechStackMarquee } from '../components/TechStackMarquee.tsx';
 import { FeaturesSection } from '../components/FeaturesSection.tsx';
 import { HowItWorksSection } from '../components/HowItWorksSection.tsx';
 import { WorkflowPreview } from '../components/WorkflowPreview.tsx';
@@ -25,6 +26,9 @@ export const HomePage: React.FC = () => {
     <div className="space-y-16 sm:space-y-24">
       {/* 1. Hero Section with visual-only AI prompt box */}
       <HeroSection />
+
+      {/* 1.5. Floating Tech Stack Logo Marquee — "Works with your stack" */}
+      <TechStackMarquee />
 
       {/* 2. Main Platform Features */}
       <FeaturesSection onSelectFeature={(feat) => setSelectedFeature(feat)} />
