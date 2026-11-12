@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express';
+import { connectDB, isDatabaseReady } from '../src/config/database';
 
 interface Check {
   name: string;
@@ -22,7 +23,14 @@ const checks: Check[] = [
   },
 ];
 
-export default function handler(_req: Request, res: Response): void {
+function describeError(error: unknown): string {
+  if (error instanceof Error) {
+    return `${error.name}: ${error.message}`.split('\n')[0] ?? error.name;
+  }
+  return String(error);
+}
+
+export default async function handler(_req: Request, res: Response): Promise<void> {
   const results: Record<string, string> = {};
 
   for (const check of checks) {
@@ -30,9 +38,18 @@ export default function handler(_req: Request, res: Response): void {
       check.run();
       results[check.name] = 'ok';
     } catch (error) {
-      results[check.name] =
-        error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+      results[check.name] = describeError(error);
     }
+  }
+
+  try {
+    await Promise.race([
+      connectDB(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('connect timeout')), 9_000)),
+    ]);
+    results['mongodb-connect'] = isDatabaseReady() ? 'ok' : 'not-ready';
+  } catch (error) {
+    results['mongodb-connect'] = describeError(error);
   }
 
   res.status(200).json({ results });
