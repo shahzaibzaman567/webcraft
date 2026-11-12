@@ -17,7 +17,7 @@
   "dependencies": {
     "@clerk/backend": "^3.27.0",
     "@supabase/supabase-js": "^2.119.0",
-    "archiver": "^8.0.0",
+    "archiver": "^7.0.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
@@ -32,7 +32,7 @@
     "minimatch": "^11.0.4"
   },
   "devDependencies": {
-    "@types/archiver": "^8.0.0",
+    "@types/archiver": "^6.0.4",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/mongoose": "^5.11.96",

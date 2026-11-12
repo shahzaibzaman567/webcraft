@@ -1,4 +1,4 @@
-import { ZipArchive } from 'archiver';
+import archiver from 'archiver';
 import { Router } from 'express';
 import { asyncHandler } from '../middleware/asyncHandler';
 import { exportLimiter } from '../middleware/rateLimiters';
@@ -18,7 +18,7 @@ router.post('/', requireUser, exportLimiter, validateBody(exportRequestSchema), 
   res.setHeader('Content-Disposition', `attachment; filename="${projectName}.zip"`);
   res.setHeader('Cache-Control', 'no-store');
 
-  const archive = new ZipArchive({ zlib: { level: 9 } });
+  const archive = archiver('zip', { zlib: { level: 9 } });
 
   archive.on('warning', () => undefined);
   archive.on('error', (error) => {
