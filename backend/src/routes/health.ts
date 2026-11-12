@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { env } from '../config/env';
 import { isDatabaseReady } from '../config/database';
 import { isInngestConfigured } from '../inngest/client';
 import { isClerkConfigured } from '../middleware/requireUser';
@@ -24,6 +25,9 @@ router.get('/', (_req, res) => {
       cooldownKeys: stats.cooldown,
       providers: stats.providers,
       capabilities: {
+        mongodb: Boolean(env.mongodbUri),
+        encryption: Boolean(env.masterEncryptionSecret),
+        adminApi: Boolean(env.adminApiSecret),
         clerk: isClerkConfigured(),
         supabase: isSupabaseConfigured(),
         email: isMailConfigured(),

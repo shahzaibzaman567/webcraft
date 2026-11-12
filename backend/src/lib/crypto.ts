@@ -15,11 +15,21 @@ function deriveKey(secret: string): Buffer {
   return crypto.createHash('sha256').update(secret, 'utf8').digest();
 }
 
-const masterKey = deriveKey(env.masterEncryptionSecret);
+function getMasterKey(): Buffer {
+  if (!env.masterEncryptionSecret) {
+    throw new AppError(
+      503,
+      'ENCRYPTION_NOT_CONFIGURED',
+      'MASTER_ENCRYPTION_SECRET is not configured on the server',
+      false,
+    );
+  }
+  return deriveKey(env.masterEncryptionSecret);
+}
 
 export function encryptSecret(plainText: string): string {
   const iv = crypto.randomBytes(IV_LENGTH);
-  const cipher = crypto.createCipheriv(ALGORITHM, masterKey, iv);
+  const cipher = crypto.createCipheriv(ALGORITHM, getMasterKey(), iv);
   cipher.setAAD(AAD);
   const encrypted = Buffer.concat([cipher.update(plainText, 'utf8'), cipher.final()]);
   const tag = cipher.getAuthTag();
@@ -43,7 +53,7 @@ export function decryptSecret(payload: string): string {
     throw new AppError(500, 'KEY_DECRYPTION_FAILED', 'Stored credential is corrupted', false);
   }
   try {
-    const decipher = crypto.createDecipheriv(ALGORITHM, masterKey, iv);
+    const decipher = crypto.createDecipheriv(ALGORITHM, getMasterKey(), iv);
     decipher.setAAD(AAD);
     decipher.setAuthTag(tag);
     return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString('utf8');
@@ -53,7 +63,7 @@ export function decryptSecret(payload: string): string {
 }
 
 export function fingerprintSecret(plainText: string): string {
-  return crypto.createHmac('sha256', masterKey).update(plainText, 'utf8').digest('hex');
+  return crypto.createHmac('sha256', getMasterKey()).update(plainText, 'utf8').digest('hex');
 }
 
 export function maskSecret(plainText: string): string {
