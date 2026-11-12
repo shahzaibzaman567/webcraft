@@ -42,7 +42,7 @@ export const SignUpPage: React.FC = () => {
                 routing="path"
                 path="/signup"
                 signInUrl="/login"
-                afterSignUpUrl="/dashboard"
+                forceRedirectUrl="/dashboard"
                 appearance={{
                   elements: {
                     rootBox: 'w-full',
@@ -100,7 +100,7 @@ export const SignUpPage: React.FC = () => {
               type="text"
               value={canvasPrompt}
               onChange={(e) => setCanvasPrompt(e.target.value)}
-              placeholder="Ask Webcarft to build your saas startup."
+              placeholder="Ask Webcraft to build your saas startup."
               className="w-full bg-transparent border-none text-slate-900 placeholder:text-slate-500 text-xs sm:text-sm px-2 focus:outline-none"
             />
             <button

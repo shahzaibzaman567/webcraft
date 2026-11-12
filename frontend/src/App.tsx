@@ -5,10 +5,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { useAuth } from '@clerk/clerk-react';
 import { ScrollToTop } from './components/ScrollToTop.tsx';
 import { Navbar } from './components/Navbar.tsx';
 import { Footer } from './components/Footer.tsx';
-import { isAuthenticated, isSuperAdmin } from './lib/auth';
+import { isAuthenticated, isSuperAdmin, CLERK_ENABLED } from './lib/auth';
 
 // Dedicated Pages
 import { HomePage } from './pages/HomePage.tsx';
@@ -38,17 +39,48 @@ import { WebcraftLoader } from './components/WebcraftLoader.tsx';
 import { AdsterraPopunder } from './components/AdsterraPopunder.tsx';
 
 // ─── Protected Route Wrapper (Auth Gate) ───
+// Uses Clerk's useAuth() hook directly so we never rely on stale localStorage
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  if (!isAuthenticated()) {
-    return <Navigate to="/login" replace />;
+  if (CLERK_ENABLED) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const { isLoaded, isSignedIn } = useAuth();
+    if (!isLoaded) {
+      return (
+        <div className="flex min-h-screen items-center justify-center bg-[#040819] text-white">
+          <div className="h-10 w-10 animate-spin rounded-full border-2 border-white/20 border-t-cyan-400" />
+        </div>
+      );
+    }
+    if (!isSignedIn) {
+      return <Navigate to="/login" replace />;
+    }
+  } else {
+    if (!isAuthenticated()) {
+      return <Navigate to="/login" replace />;
+    }
   }
   return <>{children}</>;
 }
 
 // ─── Superadmin Route Wrapper (shahzaibzaman.official@gmail.com) ───
 function AdminRoute({ children }: { children: React.ReactNode }) {
-  if (!isAuthenticated()) {
-    return <Navigate to="/login" replace />;
+  if (CLERK_ENABLED) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const { isLoaded, isSignedIn } = useAuth();
+    if (!isLoaded) {
+      return (
+        <div className="flex min-h-screen items-center justify-center bg-[#040819] text-white">
+          <div className="h-10 w-10 animate-spin rounded-full border-2 border-white/20 border-t-cyan-400" />
+        </div>
+      );
+    }
+    if (!isSignedIn) {
+      return <Navigate to="/login" replace />;
+    }
+  } else {
+    if (!isAuthenticated()) {
+      return <Navigate to="/login" replace />;
+    }
   }
   if (!isSuperAdmin()) {
     return <Navigate to="/dashboard" replace />;

@@ -18,11 +18,11 @@ export const LoginPage: React.FC = () => {
           <Link to="/" className="inline-flex items-center gap-3 group mb-10">
             <img
               src="/assets/logo.png"
-              alt="Webcarft Logo"
+              alt="Webcraft Logo"
               className="h-8 w-auto object-contain filter drop-shadow-[0_0_8px_rgba(59,130,246,0.5)] group-hover:scale-105 transition-transform"
             />
             <span className="text-xl font-extrabold tracking-tight text-slate-950 dark:text-white">
-              Webcarft
+              Webcraft
             </span>
           </Link>
 
@@ -30,7 +30,7 @@ export const LoginPage: React.FC = () => {
             Log in
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-8">
-            Welcome back. Sign in to your Webcarft workspace.
+            Welcome back. Sign in to your Webcraft workspace.
           </p>
 
           {CLERK_PUBLISHABLE_KEY ? (
@@ -39,7 +39,7 @@ export const LoginPage: React.FC = () => {
                 routing="path"
                 path="/login"
                 signUpUrl="/signup"
-                afterSignInUrl="/dashboard"
+                forceRedirectUrl="/dashboard"
                 appearance={{
                   elements: {
                     rootBox: 'w-full',
