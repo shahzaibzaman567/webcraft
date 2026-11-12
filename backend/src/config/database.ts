@@ -3,9 +3,13 @@ import { env } from './env';
 import { log } from '../lib/logger';
 
 export async function connectDB(uri: string = env.mongodbUri): Promise<void> {
+  if (!uri) {
+    log('error', 'mongodb_uri_missing');
+    return;
+  }
   try {
     await mongoose.connect(uri, {
-      serverSelectionTimeoutMS: 10_000,
+      serverSelectionTimeoutMS: 5_000,
       maxPoolSize: 10,
     });
     log('info', 'mongodb_connected', { database: mongoose.connection.name });
