@@ -9,6 +9,7 @@ let initPromise: Promise<void> | null = null;
 const app = createApp();
 
 const INIT_TIMEOUT_MS = 4_000;
+const HEALTH_INIT_TIMEOUT_MS = 6_000;
 
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   return new Promise<T>((resolve, reject) => {
@@ -62,12 +63,11 @@ export default async function handler(req: Request, res: Response): Promise<void
     console.error('Database/Settings init warning:', error);
   });
 
-  if (!isHealthRequest(req.url)) {
-    try {
-      await withTimeout(init, INIT_TIMEOUT_MS);
-    } catch (error) {
-      console.error('Request proceeded without full server initialization:', error);
-    }
+  const initTimeout = isHealthRequest(req.url) ? HEALTH_INIT_TIMEOUT_MS : INIT_TIMEOUT_MS;
+  try {
+    await withTimeout(init, initTimeout);
+  } catch (error) {
+    console.error('Request proceeded without full server initialization:', error);
   }
 
   return app(req, res);
