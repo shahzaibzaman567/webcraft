@@ -25,11 +25,13 @@ import { ContactPage } from './pages/ContactPage.tsx';
 import { SignUpPage } from './pages/SignUpPage.tsx';
 import { LoginPage } from './pages/LoginPage.tsx';
 import { DashboardPage } from './pages/DashboardPage.tsx';
+import { ProjectsPage } from './pages/ProjectsPage.tsx';
 import { BuilderPage } from './pages/BuilderPage.tsx';
 import { IntegrationsPage } from './pages/IntegrationsPage.tsx';
 import { SettingsPage } from './pages/SettingsPage.tsx';
 import { AdminPage } from './pages/AdminPage.tsx';
 import { NotFoundPage } from './pages/NotFoundPage.tsx';
+import { AppShell } from './components/AppShell.tsx';
 
 // Connect Services State & Modals
 import { ConnectedServicesProvider } from './context/ConnectedServicesContext.tsx';
@@ -88,21 +90,39 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+// ─── Authenticated app page (shared sidebar shell) ───
+function AppPage({ children }: { children: React.ReactNode }) {
+  return (
+    <ProtectedRoute>
+      <AppShell>{children}</AppShell>
+    </ProtectedRoute>
+  );
+}
+
 // ─── Inner layout wrapper (uses useLocation inside BrowserRouter) ───
 function AppLayout({ isDarkMode, toggleTheme }: { isDarkMode: boolean; toggleTheme: () => void }) {
   const location = useLocation();
 
-  // Pages that should be full-screen without Navbar/Footer
+  // Pages that should be full-screen without the public Navbar/Footer
   const normalizedPath = location.pathname.replace(/\/+$/, '') || '/';
-  const isFullScreen = normalizedPath.startsWith('/dashboard') || normalizedPath.startsWith('/builder') || normalizedPath.startsWith('/admin');
+  const isFullScreen =
+    normalizedPath.startsWith('/dashboard') ||
+    normalizedPath.startsWith('/projects') ||
+    normalizedPath.startsWith('/settings') ||
+    normalizedPath.startsWith('/integrations') ||
+    normalizedPath.startsWith('/builder') ||
+    normalizedPath.startsWith('/admin');
 
   if (isFullScreen) {
     return (
       <div className="h-screen w-screen overflow-hidden bg-[#fafbfc] dark:bg-[#030619] text-slate-900 dark:text-slate-100 transition-colors duration-300">
         <React.Suspense fallback={<WebcraftLoader variant="fullscreen" />}>
           <Routes>
-            <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-            <Route path="/dashboard/*" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+            <Route path="/dashboard" element={<AppPage><DashboardPage /></AppPage>} />
+            <Route path="/dashboard/*" element={<AppPage><DashboardPage /></AppPage>} />
+            <Route path="/projects" element={<AppPage><ProjectsPage /></AppPage>} />
+            <Route path="/settings" element={<AppPage><SettingsPage /></AppPage>} />
+            <Route path="/integrations" element={<AppPage><IntegrationsPage /></AppPage>} />
             <Route path="/builder" element={<ProtectedRoute><BuilderPage /></ProtectedRoute>} />
             <Route path="/builder/*" element={<ProtectedRoute><BuilderPage /></ProtectedRoute>} />
             <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
@@ -145,8 +165,6 @@ function AppLayout({ isDarkMode, toggleTheme }: { isDarkMode: boolean; toggleThe
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/signup" element={<SignUpPage />} />
               <Route path="/login" element={<LoginPage />} />
-              <Route path="/integrations" element={<IntegrationsPage />} />
-              <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </React.Suspense>

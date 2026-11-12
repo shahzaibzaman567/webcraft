@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useClerk } from '@clerk/clerk-react';
 import {
   Sparkles,
   Plus,
@@ -26,7 +27,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { AdsterraBanner } from '../components/AdsterraBanner';
-import { getCurrentUser, logout, isSuperAdmin, updateLocalUser, type WebcraftUser } from '../lib/auth';
+import { getCurrentUser, clearAuthUser, isSuperAdmin, updateLocalUser, CLERK_ENABLED, type WebcraftUser } from '../lib/auth';
 import { triggerPopunder } from '../lib/ads';
 import { usePublicSettings } from '../hooks/usePublicSettings';
 import { getMe, getProjects, type ApiProjectSummary } from '../lib/userApi';
@@ -34,6 +35,7 @@ import { WebcraftLoader } from '../components/WebcraftLoader';
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
+  const { signOut } = useClerk();
   const [user, setUser] = useState<WebcraftUser | null>(() => getCurrentUser());
   const [activeTab, setActiveTab] = useState<'mine' | 'recent' | 'templates'>('mine');
   const [promptInput, setPromptInput] = useState('');
@@ -140,9 +142,13 @@ export const DashboardPage: React.FC = () => {
     navigate(`/builder?prompt=${encodeURIComponent(promptInput.trim())}&framework=${selectedFramework}`);
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const handleLogout = async () => {
+    clearAuthUser();
+    if (CLERK_ENABLED) {
+      await signOut({ redirectUrl: '/login' });
+    } else {
+      navigate('/login');
+    }
   };
 
   const filteredProjects = projects.filter((p) =>
