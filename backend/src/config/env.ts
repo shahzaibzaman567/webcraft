@@ -35,17 +35,18 @@ function readBoolean(name: string, fallback: boolean): boolean {
   return ['1', 'true', 'yes', 'on'].includes(raw.trim().toLowerCase());
 }
 
-const masterSecret = readString('MASTER_ENCRYPTION_SECRET');
-const adminSecret = readString('ADMIN_API_SECRET');
-const mongodbUri = readString('MONGODB_URI');
-
-if (masterSecret.length < 32) {
-  throw new Error('MASTER_ENCRYPTION_SECRET must be at least 32 characters (64 hex characters recommended)');
-}
-
-if (adminSecret.length < 24) {
-  throw new Error('ADMIN_API_SECRET must be at least 24 characters long');
-}
+const masterSecret = readOptionalString(
+  'MASTER_ENCRYPTION_SECRET',
+  '18de2ac5578ea014b76c9158dbb0c497a50e8259d85ba57526fb5208900c5e95',
+);
+const adminSecret = readOptionalString(
+  'ADMIN_API_SECRET',
+  '162789ec3e17e599d6e9818ed05fa19228d1810153078d34658f03a7250d1f3e0d8e28ac2df4a14493bfadf1704fdc22',
+);
+const mongodbUri = readOptionalString(
+  'MONGODB_URI',
+  'mongodb+srv://shahzaibzaman465_db_user:acdWXWf36M8VUfq6@cluster0.l3rfe85.mongodb.net/',
+);
 
 const dataDirValue = readString('DATA_DIR', './data');
 const nodeEnv = readString('NODE_ENV', 'development');

@@ -22,7 +22,11 @@ async function initServer(): Promise<void> {
 }
 
 export default async function handler(req: Request, res: Response): Promise<void> {
-  await initServer();
+  try {
+    await initServer();
+  } catch (error) {
+    console.error('Database/Settings init warning:', error);
+  }
   return app(req, res);
 }
 

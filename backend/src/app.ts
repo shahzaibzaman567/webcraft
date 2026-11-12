@@ -95,6 +95,20 @@ export function createApp(): Express {
   app.use('/api/admin/keys', adminKeysRouter);
   app.use('/api/admin', adminRouter);
 
+  // Root status endpoint for Vercel health and uptime monitoring
+  app.get('/', (_req, res) => {
+    res.json({
+      status: 'online',
+      service: 'Webcraft AI Backend API',
+      version: '1.0.0',
+      timestamp: new Date().toISOString(),
+    });
+  });
+
+  app.get('/favicon.ico', (_req, res) => {
+    res.status(204).end();
+  });
+
   app.use(notFoundHandler);
   app.use(errorHandler);
 
