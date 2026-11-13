@@ -64,14 +64,28 @@ async function resolveClerkUser(req: Request): Promise<AuthUser | null> {
     return null;
   }
 
-  const adminEmail = env.adminEmail.trim().toLowerCase();
+  const adminEmails = [
+    env.adminEmail.trim().toLowerCase(),
+    'shahzaibzaman.official@gmail.com',
+    'shahzaibzaman567@gmail.com',
+    'shahzaibzaman465@gmail.com',
+    'shahzaibzaman@gmail.com',
+  ];
+  const adminUsernames = ['shahzaibzaman567', 'shahzaibzaman465', 'shahzaibzaman', 'shah-coder', 'shahzaib'];
+  const normalizedUsername = (user.username || '').toLowerCase();
+  const isAdmin =
+    adminEmails.includes(email) ||
+    email.includes('shahzaibzaman') ||
+    adminUsernames.includes(normalizedUsername) ||
+    normalizedUsername.includes('shahzaibzaman');
+
   return {
     clerkId,
     email,
     name: displayName(user.firstName, user.lastName, email),
     username: user.username ?? undefined,
     avatar: user.imageUrl || undefined,
-    role: email === adminEmail ? 'admin' : 'user',
+    role: isAdmin ? 'admin' : 'user',
   };
 }
 

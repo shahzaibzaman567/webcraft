@@ -216,9 +216,8 @@ const AppShellContent: React.FC<AppShellContentProps> = ({ children, clerkSignOu
       }}
     >
       <div
-        className={`flex h-screen w-screen overflow-hidden font-sans transition-colors duration-300 ${
-          isDark ? 'bg-[#07090e] text-slate-100' : 'bg-[#f4f6fb] text-slate-900'
-        }`}
+        className={`flex h-screen w-screen overflow-hidden font-sans transition-colors duration-300 ${isDark ? 'bg-[#07090e] text-slate-100' : 'bg-[#f4f6fb] text-slate-900'
+          }`}
       >
         {sidebarOpen && (
           <div
@@ -228,11 +227,10 @@ const AppShellContent: React.FC<AppShellContentProps> = ({ children, clerkSignOu
         )}
 
         <aside
-          className={`fixed inset-y-0 left-0 z-40 flex h-full shrink-0 flex-col overflow-hidden border-r transition-all duration-300 lg:static ${surface} ${
-            sidebarCollapsed
+          className={`fixed inset-y-0 left-0 z-40 flex h-full shrink-0 flex-col overflow-hidden border-r transition-all duration-300 lg:static ${surface} ${sidebarCollapsed
               ? 'w-0 -translate-x-full border-r-0 lg:w-0 lg:translate-x-0'
               : 'w-64 ' + (sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0')
-          }`}
+            }`}
         >
           <div className={`border-b p-3 ${isDark ? 'border-white/10' : 'border-slate-200'}`}>
             <div className="flex items-center justify-between">
@@ -266,9 +264,8 @@ const AppShellContent: React.FC<AppShellContentProps> = ({ children, clerkSignOu
             </div>
 
             <div
-              className={`mt-2 flex items-center gap-2.5 rounded-xl border p-2 ${
-                isDark ? 'border-white/5 bg-white/[0.02]' : 'border-slate-200 bg-slate-50'
-              }`}
+              className={`mt-2 flex items-center gap-2.5 rounded-xl border p-2 ${isDark ? 'border-white/5 bg-white/[0.02]' : 'border-slate-200 bg-slate-50'
+                }`}
             >
               <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-purple-600 text-xs font-bold text-white">
                 {accountInitial}
@@ -298,11 +295,10 @@ const AppShellContent: React.FC<AppShellContentProps> = ({ children, clerkSignOu
                   event.preventDefault();
                   navigate('/projects');
                 }}
-                className={`flex items-center gap-2 rounded-xl border px-3 py-2 ${
-                  isDark
+                className={`flex items-center gap-2 rounded-xl border px-3 py-2 ${isDark
                     ? 'border-white/10 bg-white/5 focus-within:border-blue-500/50'
                     : 'border-slate-200 bg-slate-50 focus-within:border-blue-500/50'
-                }`}
+                  }`}
               >
                 <Search className={`h-3.5 w-3.5 shrink-0 ${muted}`} />
                 <input
@@ -310,9 +306,8 @@ const AppShellContent: React.FC<AppShellContentProps> = ({ children, clerkSignOu
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
                   placeholder="Search AI projects..."
-                  className={`w-full bg-transparent text-xs outline-none ${
-                    isDark ? 'text-white placeholder:text-slate-500' : 'text-slate-900 placeholder:text-slate-400'
-                  }`}
+                  className={`w-full bg-transparent text-xs outline-none ${isDark ? 'text-white placeholder:text-slate-500' : 'text-slate-900 placeholder:text-slate-400'
+                    }`}
                 />
                 {searchQuery && (
                   <button
@@ -330,9 +325,8 @@ const AppShellContent: React.FC<AppShellContentProps> = ({ children, clerkSignOu
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold transition-colors ${
-                    isActive(item.path) ? activeItem : `${muted} ${hover}`
-                  }`}
+                  className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold transition-colors ${isActive(item.path) ? activeItem : `${muted} ${hover}`
+                    }`}
                 >
                   <item.icon className="h-4 w-4 shrink-0" />
                   <span className="truncate">{item.label}</span>
@@ -342,13 +336,12 @@ const AppShellContent: React.FC<AppShellContentProps> = ({ children, clerkSignOu
               {isSuperAdmin() && (
                 <Link
                   to="/admin"
-                  className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold transition-colors ${
-                    isActive('/admin')
+                  className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold transition-colors ${isActive('/admin')
                       ? activeItem
                       : isDark
                         ? 'text-purple-300 hover:bg-purple-600/20 hover:text-white'
                         : 'text-purple-700 hover:bg-purple-50'
-                  }`}
+                    }`}
                 >
                   <ShieldCheck className="h-4 w-4 shrink-0" />
                   <span>Superadmin Hub</span>
@@ -372,9 +365,8 @@ const AppShellContent: React.FC<AppShellContentProps> = ({ children, clerkSignOu
                   <Link
                     key={project.id}
                     to={`/builder?id=${project.id}`}
-                    className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors ${
-                      isDark ? 'text-slate-300 hover:bg-white/5 hover:text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                    }`}
+                    className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors ${isDark ? 'text-slate-300 hover:bg-white/5 hover:text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                      }`}
                   >
                     <span className="h-2 w-2 shrink-0 rounded-full bg-blue-400" />
                     <span className="truncate">{project.name || 'Untitled Project'}</span>
@@ -388,11 +380,10 @@ const AppShellContent: React.FC<AppShellContentProps> = ({ children, clerkSignOu
             <button
               type="button"
               onClick={toggleTheme}
-              className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-xs font-medium transition-colors ${
-                isDark
+              className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-xs font-medium transition-colors ${isDark
                   ? 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
                   : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-              }`}
+                }`}
               title="Toggle dark / light theme"
             >
               <span className="flex items-center gap-2">
@@ -404,9 +395,8 @@ const AppShellContent: React.FC<AppShellContentProps> = ({ children, clerkSignOu
 
             <Link
               to="/settings"
-              className={`flex items-center gap-2.5 rounded-xl px-1 py-1 transition-colors ${
-                isDark ? 'hover:bg-white/5' : 'hover:bg-slate-100'
-              }`}
+              className={`flex items-center gap-2.5 rounded-xl px-1 py-1 transition-colors ${isDark ? 'hover:bg-white/5' : 'hover:bg-slate-100'
+                }`}
             >
               <div className="relative">
                 {user?.avatar ? (
@@ -417,9 +407,8 @@ const AppShellContent: React.FC<AppShellContentProps> = ({ children, clerkSignOu
                   </div>
                 )}
                 <span
-                  className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ${
-                    isDark ? 'ring-[#0a0d14]' : 'ring-white'
-                  }`}
+                  className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ${isDark ? 'ring-[#0a0d14]' : 'ring-white'
+                    }`}
                 />
               </div>
               <div className="min-w-0 flex-1">
@@ -437,9 +426,8 @@ const AppShellContent: React.FC<AppShellContentProps> = ({ children, clerkSignOu
 
         <div className="flex min-w-0 flex-1 flex-col">
           <header
-            className={`flex h-16 shrink-0 items-center justify-between gap-3 border-b px-4 backdrop-blur md:px-6 ${
-              isDark ? 'border-white/10 bg-[#07090e]/90' : 'border-slate-200 bg-white/90'
-            }`}
+            className={`flex h-16 shrink-0 items-center justify-between gap-3 border-b px-4 backdrop-blur md:px-6 ${isDark ? 'border-white/10 bg-[#07090e]/90' : 'border-slate-200 bg-white/90'
+              }`}
           >
             <div className="flex min-w-0 items-center gap-2">
               {/* Mobile open button */}
@@ -478,43 +466,26 @@ const AppShellContent: React.FC<AppShellContentProps> = ({ children, clerkSignOu
             </div>
 
             <div className="flex items-center gap-2">
-              <div className="relative hidden md:block">
-                <Search className={`absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 ${muted}`} />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                  placeholder="Search projects..."
-                  className={`w-56 rounded-full border py-1.5 pl-8 pr-3 text-xs outline-none transition-colors ${
-                    isDark
-                      ? 'border-white/10 bg-white/5 text-white placeholder:text-slate-500 focus:border-blue-500/50'
-                      : 'border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-blue-500/50'
-                  }`}
-                />
-              </div>
-
               <button
                 type="button"
                 onClick={toggleTheme}
-                className={`rounded-full border p-2 transition-colors ${
-                  isDark
+                className={`rounded-full border p-2 transition-colors cursor-pointer ${isDark
                     ? 'border-white/10 bg-white/5 text-amber-400 hover:bg-white/10'
                     : 'border-slate-200 bg-slate-50 text-purple-600 hover:bg-slate-100'
-                }`}
+                  }`}
                 aria-label="Toggle theme"
               >
                 {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </button>
 
-              <div className="relative">
+              <div className="relative z-50">
                 <button
                   type="button"
                   onClick={() => setUserMenuOpen((open) => !open)}
-                  className={`flex items-center gap-2 rounded-full border py-1 pl-1 pr-2 transition-colors ${
-                    isDark
+                  className={`flex items-center gap-2 rounded-full border py-1 pl-1 pr-2 transition-colors cursor-pointer ${isDark
                       ? 'border-white/10 bg-white/5 hover:bg-white/10'
                       : 'border-slate-200 bg-slate-50 hover:bg-slate-100'
-                  }`}
+                    }`}
                 >
                   {user?.avatar ? (
                     <img src={user.avatar} alt={user.name} className="h-7 w-7 rounded-full object-cover" />
@@ -531,11 +502,10 @@ const AppShellContent: React.FC<AppShellContentProps> = ({ children, clerkSignOu
 
                 {userMenuOpen && (
                   <>
-                    <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
+                    <div className="fixed inset-0 z-40 bg-transparent" onClick={() => setUserMenuOpen(false)} />
                     <div
-                      className={`absolute right-0 top-full z-50 mt-2 w-60 overflow-hidden rounded-2xl border shadow-2xl ${
-                        isDark ? 'border-white/10 bg-[#0f1420]' : 'border-slate-200 bg-white'
-                      }`}
+                      className={`absolute right-0 top-full z-50 mt-2 w-60 overflow-hidden rounded-2xl border shadow-2xl ${isDark ? 'border-white/10 bg-[#0f1420]' : 'border-slate-200 bg-white'
+                        }`}
                     >
                       <div className={`border-b p-3 ${isDark ? 'border-white/10' : 'border-slate-100'}`}>
                         <div className={`truncate text-xs font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -543,14 +513,18 @@ const AppShellContent: React.FC<AppShellContentProps> = ({ children, clerkSignOu
                         </div>
                         <div className={`truncate text-[10px] ${muted}`}>{user?.email || 'Signed in'}</div>
                       </div>
-                      <div className="p-1.5">
+                      <div className="p-1.5 space-y-0.5">
                         <button
                           type="button"
                           onClick={() => {
                             setUserMenuOpen(false);
                             navigate('/settings');
                           }}
-                          className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium transition-colors ${muted} ${hover}`}
+                          className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-semibold transition-colors cursor-pointer ${
+                            isDark
+                              ? 'text-slate-200 hover:bg-white/10 hover:text-white'
+                              : 'text-slate-700 hover:bg-slate-100 hover:text-blue-600'
+                          }`}
                         >
                           <Settings className="h-3.5 w-3.5" />
                           <span>Settings</span>
@@ -561,7 +535,11 @@ const AppShellContent: React.FC<AppShellContentProps> = ({ children, clerkSignOu
                             setUserMenuOpen(false);
                             navigate('/projects');
                           }}
-                          className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium transition-colors ${muted} ${hover}`}
+                          className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-semibold transition-colors cursor-pointer ${
+                            isDark
+                              ? 'text-slate-200 hover:bg-white/10 hover:text-white'
+                              : 'text-slate-700 hover:bg-slate-100 hover:text-blue-600'
+                          }`}
                         >
                           <FolderGit2 className="h-3.5 w-3.5" />
                           <span>My Projects</span>
@@ -573,13 +551,13 @@ const AppShellContent: React.FC<AppShellContentProps> = ({ children, clerkSignOu
                               setUserMenuOpen(false);
                               navigate('/admin');
                             }}
-                            className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium transition-colors ${
+                            className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-semibold transition-colors cursor-pointer ${
                               isDark
-                                ? 'text-purple-300 hover:bg-purple-500/10'
+                                ? 'text-purple-300 hover:bg-purple-500/15 hover:text-purple-200'
                                 : 'text-purple-700 hover:bg-purple-50'
                             }`}
                           >
-                            <ShieldCheck className="h-3.5 w-3.5" />
+                            <ShieldCheck className="h-3.5 w-3.5 text-purple-400" />
                             <span>Admin Panel</span>
                           </button>
                         )}
@@ -587,8 +565,11 @@ const AppShellContent: React.FC<AppShellContentProps> = ({ children, clerkSignOu
                       <div className={`border-t p-1.5 ${isDark ? 'border-white/10' : 'border-slate-100'}`}>
                         <button
                           type="button"
-                          onClick={handleLogout}
-                          className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium text-rose-500 transition-colors ${
+                          onClick={() => {
+                            setUserMenuOpen(false);
+                            void handleLogout();
+                          }}
+                          className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-semibold text-rose-500 hover:text-rose-400 transition-colors cursor-pointer ${
                             isDark ? 'hover:bg-rose-500/10' : 'hover:bg-rose-50'
                           }`}
                         >

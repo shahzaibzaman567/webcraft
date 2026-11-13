@@ -238,6 +238,9 @@ export const BuilderPage: React.FC = () => {
   // Chat & AI states
   const [chatInput, setChatInput] = useState('');
   const [buildModeDropdown, setBuildModeDropdown] = useState(false);
+  const [isListeningVoice, setIsListeningVoice] = useState(false);
+  const [voiceInterim, setVoiceInterim] = useState('');
+  const builderRecognitionRef = useRef<any>(null);
   const [buildMode, setBuildMode] = useState<'Build' | 'Plan' | 'Fix'>(() => {
     const requestedMode = searchParams.get('mode');
     return requestedMode === 'Plan' || requestedMode === 'Fix' ? requestedMode : 'Build';
@@ -478,24 +481,70 @@ export const BuilderPage: React.FC = () => {
 
   const handleVoiceInput = () => {
     const speechWindow = window as typeof window & {
-      SpeechRecognition?: new () => SpeechRecognitionLike;
-      webkitSpeechRecognition?: new () => SpeechRecognitionLike;
+      SpeechRecognition?: new () => any;
+      webkitSpeechRecognition?: new () => any;
     };
     const Recognition = speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
     if (!Recognition) {
-      setLoadError('Voice input is not supported in this browser.');
+      setLoadError('Voice input is not supported in this browser. Please use Google Chrome or Microsoft Edge.');
       return;
     }
+
+    if (isListeningVoice) {
+      if (builderRecognitionRef.current) {
+        builderRecognitionRef.current.stop();
+      }
+      setIsListeningVoice(false);
+      return;
+    }
+
     const recognition = new Recognition();
+    builderRecognitionRef.current = recognition;
     recognition.lang = 'en-US';
-    recognition.interimResults = false;
-    recognition.onresult = (event) => {
-      const transcript = event.results?.[0]?.[0]?.transcript?.trim();
-      if (transcript) {
-        setChatInput((prev) => `${prev}${prev ? ' ' : ''}${transcript}`);
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    setIsListeningVoice(true);
+    setVoiceInterim('');
+
+    recognition.onresult = (event: any) => {
+      let finalTranscript = '';
+      let interim = '';
+      for (let i = 0; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript + ' ';
+        } else {
+          interim += transcript;
+        }
+      }
+      const current = (finalTranscript || interim).trim();
+      setVoiceInterim(current);
+
+      if (finalTranscript.trim()) {
+        setChatInput((prev) => `${prev}${prev ? ' ' : ''}${finalTranscript.trim()}`);
       }
     };
-    recognition.onerror = () => setLoadError('Voice input could not start.');
+
+    recognition.onerror = () => {
+      setIsListeningVoice(false);
+    };
+
+    recognition.onend = () => {
+      setIsListeningVoice(false);
+      if (voiceInterim.trim()) {
+        setChatInput((prev) => {
+          const base = prev.trim();
+          const spoken = voiceInterim.trim();
+          if (base.includes(spoken)) return base;
+          return base ? `${base} ${spoken}` : spoken;
+        });
+      }
+      setTimeout(() => {
+        document.getElementById('builder-chat-input')?.focus();
+      }, 50);
+    };
+
     recognition.start();
   };
 
@@ -1284,32 +1333,49 @@ export const BuilderPage: React.FC = () => {
 
             {/* Bottom Input Area (Lovable style prompt box) */}
             <div className="p-3 border-t border-white/10 bg-[#0a0d14]">
-              <div className="rounded-2xl bg-[#141926] border border-white/10 p-2.5 space-y-2 focus-within:border-blue-500/50 transition-colors">
-                <textarea
-                  id="builder-chat-input"
-                  rows={2}
-                  value={chatInput}
-                  disabled={isGenerating || loadingProject}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSendMessage();
-                    }
-                  }}
-                  placeholder={isGenerating ? 'Building your project...' : 'Describe what to build or change...'}
-                  className="w-full bg-transparent text-xs text-white placeholder:text-slate-500 focus:outline-none resize-none leading-relaxed disabled:opacity-60"
-                />
+              <div className="rounded-2xl bg-[#0c101a] border border-white/10 p-2.5 space-y-2 focus-within:border-blue-500/50 transition-colors">
+                {isListeningVoice ? (
+                  <div className="flex min-h-[50px] flex-col items-center justify-center py-2 space-y-1.5">
+                    <div className="flex items-center gap-1.5 h-6">
+                      <span className="w-1.5 rounded-full bg-gradient-to-t from-cyan-500 to-blue-500 animate-soundwave" style={{ height: '18px', animationDelay: '0ms' }} />
+                      <span className="w-1.5 rounded-full bg-gradient-to-t from-blue-500 to-indigo-500 animate-soundwave" style={{ height: '28px', animationDelay: '120ms' }} />
+                      <span className="w-1.5 rounded-full bg-gradient-to-t from-indigo-500 to-purple-500 animate-soundwave" style={{ height: '38px', animationDelay: '240ms' }} />
+                      <span className="w-1.5 rounded-full bg-gradient-to-t from-purple-500 to-pink-500 animate-soundwave" style={{ height: '24px', animationDelay: '360ms' }} />
+                      <span className="w-1.5 rounded-full bg-gradient-to-t from-pink-500 to-rose-500 animate-soundwave" style={{ height: '40px', animationDelay: '180ms' }} />
+                      <span className="w-1.5 rounded-full bg-gradient-to-t from-indigo-500 to-blue-500 animate-soundwave" style={{ height: '26px', animationDelay: '300ms' }} />
+                      <span className="w-1.5 rounded-full bg-gradient-to-t from-cyan-500 to-blue-400 animate-soundwave" style={{ height: '16px', animationDelay: '80ms' }} />
+                    </div>
+                    <p className="text-[11px] font-semibold text-cyan-400 animate-pulse text-center">
+                      {voiceInterim || 'Listening... speak, click mic to finish'}
+                    </p>
+                  </div>
+                ) : (
+                  <textarea
+                    id="builder-chat-input"
+                    rows={2}
+                    value={chatInput}
+                    disabled={isGenerating || loadingProject}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSendMessage();
+                      }
+                    }}
+                    placeholder={isGenerating ? 'Building your project...' : 'Ask Webcraft to build or change...'}
+                    className="w-full bg-transparent text-xs text-white placeholder:text-slate-500 focus:outline-none resize-none leading-relaxed disabled:opacity-60"
+                  />
+                )}
 
                 <div className="flex items-center justify-between pt-1">
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
                       onClick={() => document.getElementById('builder-chat-input')?.focus()}
-                      className="w-6 h-6 rounded-full border border-white/10 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors cursor-pointer"
+                      className="w-6 h-6 rounded-lg hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors cursor-pointer"
                       title="Focus prompt"
                     >
-                      <Plus className="w-3 h-3" />
+                      <Plus className="w-3.5 h-3.5" />
                     </button>
 
                     {/* Mode Selector Dropdown */}
@@ -1330,8 +1396,9 @@ export const BuilderPage: React.FC = () => {
                               key={mode}
                               type="button"
                               onClick={() => { setBuildMode(mode); setBuildModeDropdown(false); }}
-                              className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs transition-colors ${buildMode === mode ? 'bg-blue-600 text-white font-bold' : 'text-slate-300 hover:bg-white/5'
-                                }`}
+                              className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                                buildMode === mode ? 'bg-blue-600 text-white font-bold' : 'text-slate-300 hover:bg-white/5'
+                              }`}
                             >
                               {mode}
                             </button>
@@ -1346,8 +1413,12 @@ export const BuilderPage: React.FC = () => {
                       type="button"
                       onClick={handleVoiceInput}
                       disabled={isGenerating || loadingProject}
-                      className="p-1.5 text-slate-400 hover:text-white transition-colors cursor-pointer disabled:opacity-40"
-                      title="Voice input"
+                      className={`p-1.5 rounded-lg transition-all cursor-pointer disabled:opacity-40 ${
+                        isListeningVoice
+                          ? 'bg-rose-500 text-white animate-pulse shadow-md shadow-rose-500/50'
+                          : 'text-slate-400 hover:text-white hover:bg-white/10'
+                      }`}
+                      title={isListeningVoice ? 'Listening... click to stop' : 'Voice input'}
                     >
                       <Mic className="w-3.5 h-3.5" />
                     </button>
@@ -1355,7 +1426,7 @@ export const BuilderPage: React.FC = () => {
                       type="button"
                       onClick={handleSendMessage}
                       disabled={!chatInput.trim() || isGenerating || loadingProject}
-                      className="w-7 h-7 rounded-full bg-white text-black flex items-center justify-center hover:bg-slate-200 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-500 shadow-md shadow-blue-500/20 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       <ArrowUp className="w-3.5 h-3.5 font-bold" />
                     </button>

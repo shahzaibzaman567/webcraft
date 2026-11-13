@@ -1,19 +1,20 @@
 import React, { useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   ArrowUp,
   ChevronDown,
-  ChevronRight,
   Compass,
   Hammer,
   Mic,
-  Paperclip,
+  Plus,
+  Sparkles,
   Wand2,
   X,
 } from 'lucide-react';
 import { useAppShell } from '../components/AppShell';
 import { triggerPopunder } from '../lib/ads';
 import { usePublicSettings } from '../hooks/usePublicSettings';
+import { AdsterraBanner } from '../components/AdsterraBanner';
 
 type BuildMode = 'Build' | 'Fix' | 'Plan';
 
@@ -35,59 +36,104 @@ interface PromptAttachment {
   size: number;
 }
 
+// 4 clean, emoji-free, 2-line descriptive prompts (per user instruction)
 const QUICK_PROMPTS = [
-  { emoji: '🎬', label: 'Build a Netflix clone' },
-  { emoji: '📊', label: 'Build an admin dashboard' },
-  { emoji: '📋', label: 'Build a kanban board' },
-  { emoji: '📁', label: 'Build a file manager' },
-  { emoji: '▶️', label: 'Build a YouTube clone' },
-  { emoji: '🏪', label: 'Build a store page' },
-  { emoji: '🏠', label: 'Build an Airbnb clone' },
-  { emoji: '🎵', label: 'Build a Spotify clone' },
+  'Build a Netflix-style streaming platform with movie hero trailers, responsive category carousels, video preview modals and smart search',
+  'Build a comprehensive SaaS admin dashboard with real-time analytics charts, revenue metric cards, user management tables and activity feeds',
+  'Build an interactive Kanban project board with drag-and-drop task cards, customizable sprint columns, priority tags and team assignments',
+  'Build a modern cloud file manager with file explorer view, folder tree hierarchy, instant search and storage quota breakdown',
 ];
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
-  const { isDark } = useAppShell();
+  const { user, isDark } = useAppShell();
   const { settings } = usePublicSettings();
 
   const [promptInput, setPromptInput] = useState('');
   const [mode, setMode] = useState<BuildMode>('Build');
   const [showModeDropdown, setShowModeDropdown] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [interimVoiceText, setInterimVoiceText] = useState('');
   const [attachments, setAttachments] = useState<PromptAttachment[]>([]);
   const [attachmentError, setAttachmentError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const recognitionRef = useRef<any>(null);
 
+  // ChatGPT-style voice recognition with wave visualizer
   const toggleSpeechRecognition = () => {
     if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      setAttachmentError('Voice input is not supported in this browser. Use Chrome or Edge.');
+      alert('Voice input is not supported in this browser. Please use Google Chrome or Microsoft Edge.');
+      return;
+    }
+
+    if (isListening) {
+      // User clicked again -> Stop and commit text
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      setIsListening(false);
       return;
     }
 
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
-    recognition.continuous = false;
-    recognition.interimResults = false;
+    recognitionRef.current = recognition;
+    recognition.continuous = true;
+    recognition.interimResults = true;
     recognition.lang = 'en-US';
 
-    if (isListening) {
-      recognition.stop();
-      setIsListening(false);
-      return;
-    }
-
     setIsListening(true);
-    recognition.onstart = () => setIsListening(true);
+    setInterimVoiceText('');
+
+    recognition.onstart = () => {
+      setIsListening(true);
+    };
+
     recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript;
-      setPromptInput((prev) => (prev ? `${prev} ${transcript}` : transcript));
+      let finalTranscript = '';
+      let interim = '';
+
+      for (let i = 0; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript + ' ';
+        } else {
+          interim += transcript;
+        }
+      }
+
+      const currentSpeech = (finalTranscript || interim).trim();
+      setInterimVoiceText(currentSpeech);
+
+      if (finalTranscript.trim()) {
+        setPromptInput((prev) => {
+          const base = prev.trim();
+          return base ? `${base} ${finalTranscript.trim()}` : finalTranscript.trim();
+        });
+      }
+    };
+
+    recognition.onerror = () => {
       setIsListening(false);
     };
-    recognition.onerror = () => setIsListening(false);
-    recognition.onend = () => setIsListening(false);
+
+    recognition.onend = () => {
+      setIsListening(false);
+      if (interimVoiceText.trim()) {
+        setPromptInput((prev) => {
+          const base = prev.trim();
+          const spoken = interimVoiceText.trim();
+          if (base.includes(spoken)) return base;
+          return base ? `${base} ${spoken}` : spoken;
+        });
+      }
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 50);
+    };
+
     recognition.start();
   };
 
@@ -142,67 +188,80 @@ export const DashboardPage: React.FC = () => {
     }
   };
 
+  const firstName = user?.name ? user.name.split(' ')[0] : 'Shahzaib';
   const modeMeta = MODE_META[mode];
   const ModeIcon = modeMeta.icon;
 
   return (
-    <div className="relative flex min-h-[calc(100vh-4rem)] items-center justify-center p-4 sm:p-6 md:p-8">
+    <div className="relative flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center px-4 py-8 sm:px-6">
       {/* Ambient background glow */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute left-1/2 top-1/2 h-[550px] w-[550px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-tr from-blue-500/10 via-purple-500/10 to-pink-500/10 blur-3xl" />
+        <div className="absolute left-1/2 top-1/3 h-[450px] w-[550px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-tr from-blue-500/12 via-purple-500/10 to-pink-500/10 blur-3xl" />
       </div>
 
-      <div className="relative z-10 mx-auto flex w-full max-w-3xl flex-col items-center">
-        {/* Top Logo + Brand Hero */}
-        <div className="mb-8 flex flex-col items-center text-center">
-          <div className="relative mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 via-purple-600 to-pink-600 p-0.5 shadow-xl shadow-blue-500/20">
-            <div className="flex h-full w-full items-center justify-center rounded-[14px] bg-[#07090e]">
-              <img
-                src="/assets/logo.png"
-                alt="Webcraft"
-                className="h-8 w-auto object-contain drop-shadow-[0_0_12px_rgba(59,130,246,0.6)]"
-              />
-            </div>
-          </div>
-          <h1 className={`text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl ${isDark ? 'text-white' : 'text-slate-900'}`}>
-            Build Something with Webcraft
-          </h1>
-          <p className={`mt-2.5 text-sm sm:text-base ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-            Create apps and websites by chatting with AI
-          </p>
+      <div className="relative z-10 mx-auto flex w-full max-w-2xl flex-col items-center">
+        {/* Top Feature Pill (Lovable Style) */}
+        <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-xs font-semibold text-blue-600 dark:text-cyan-300 shadow-sm">
+          <Sparkles className="h-3.5 w-3.5 text-blue-500" />
+          <span>Build full-stack web applications with AI</span>
         </div>
 
-        {/* Large Prompt Input Card (KaifGenUI / Builder style) */}
+        {/* Clean Heading (Lovable Style: "Ready to build, Shahzaib?") */}
+        <h1 className={`mb-6 text-center text-3xl font-extrabold tracking-tight sm:text-4xl ${isDark ? 'text-white' : 'text-slate-900'}`}>
+          Ready to build, {firstName}?
+        </h1>
+
+        {/* Lovable-Style Compact Prompt Box */}
         <form
           onSubmit={handlePromptGenerate}
-          className={`w-full overflow-hidden rounded-2xl border shadow-2xl transition-all ${
+          className={`w-full rounded-2xl sm:rounded-3xl border shadow-xl transition-all ${
             isDark
-              ? 'border-white/10 bg-[#0f1420]/95 shadow-blue-500/5 focus-within:border-blue-500/50'
-              : 'border-slate-200 bg-white shadow-slate-200/50 focus-within:border-blue-500/50'
+              ? 'border-white/10 bg-[#0c101a] shadow-black/40 focus-within:border-blue-500/60 focus-within:ring-2 focus-within:ring-blue-500/20'
+              : 'border-slate-200 bg-white shadow-slate-200/60 focus-within:border-blue-500/60 focus-within:ring-2 focus-within:ring-blue-500/20'
           }`}
         >
-          <div className="p-4 sm:p-6">
-            <textarea
-              ref={textareaRef}
-              value={promptInput}
-              onChange={(event) => setPromptInput(event.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="What would you like to build?"
-              rows={4}
-              className={`w-full resize-none bg-transparent text-sm leading-relaxed outline-none sm:text-base ${
-                isDark
-                  ? 'text-white placeholder:text-slate-500'
-                  : 'text-slate-900 placeholder:text-slate-400'
-              }`}
-            />
+          <div className="p-3.5 sm:p-4">
+            {isListening ? (
+              /* ChatGPT-style live wave animation */
+              <div className="flex min-h-[64px] flex-col items-center justify-center py-2 space-y-2">
+                <div className="flex items-center gap-1.5 h-8">
+                  <span className="w-1.5 rounded-full bg-gradient-to-t from-cyan-500 to-blue-500 animate-soundwave" style={{ height: '24px', animationDelay: '0ms' }} />
+                  <span className="w-1.5 rounded-full bg-gradient-to-t from-blue-500 to-indigo-500 animate-soundwave" style={{ height: '36px', animationDelay: '120ms' }} />
+                  <span className="w-1.5 rounded-full bg-gradient-to-t from-indigo-500 to-purple-500 animate-soundwave" style={{ height: '48px', animationDelay: '240ms' }} />
+                  <span className="w-1.5 rounded-full bg-gradient-to-t from-purple-500 to-pink-500 animate-soundwave" style={{ height: '30px', animationDelay: '360ms' }} />
+                  <span className="w-1.5 rounded-full bg-gradient-to-t from-pink-500 to-rose-500 animate-soundwave" style={{ height: '52px', animationDelay: '180ms' }} />
+                  <span className="w-1.5 rounded-full bg-gradient-to-t from-indigo-500 to-blue-500 animate-soundwave" style={{ height: '34px', animationDelay: '300ms' }} />
+                  <span className="w-1.5 rounded-full bg-gradient-to-t from-cyan-500 to-blue-400 animate-soundwave" style={{ height: '20px', animationDelay: '80ms' }} />
+                </div>
+                <div className="text-center">
+                  <p className="text-xs font-semibold text-blue-500 dark:text-cyan-400 animate-pulse">
+                    {interimVoiceText || 'Listening... speak your prompt, click mic again to finish'}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <textarea
+                ref={textareaRef}
+                value={promptInput}
+                onChange={(event) => setPromptInput(event.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Ask Webcraft to build..."
+                rows={2}
+                className={`w-full resize-none bg-transparent text-sm leading-relaxed outline-none sm:text-base ${
+                  isDark
+                    ? 'text-white placeholder:text-slate-500'
+                    : 'text-slate-900 placeholder:text-slate-400'
+                }`}
+              />
+            )}
 
             {/* Attached files preview */}
             {attachments.length > 0 && (
-              <div className="mt-3 flex flex-wrap items-center gap-1.5 pt-2 border-t border-white/5">
+              <div className="mt-2 flex flex-wrap items-center gap-1.5 pt-1.5 border-t border-white/5">
                 {attachments.map((file, index) => (
                   <span
                     key={`${file.name}-${index}`}
-                    className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-blue-500/20 bg-blue-500/10 px-2.5 py-1 text-[10px] font-semibold text-blue-700 dark:text-blue-300"
+                    className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-blue-500/20 bg-blue-500/10 px-2.5 py-0.5 text-[10px] font-semibold text-blue-700 dark:text-blue-300"
                   >
                     <span className="max-w-40 truncate">{file.name}</span>
                     <span className="text-blue-400">{Math.max(1, Math.round(file.size / 1024))} KB</span>
@@ -211,7 +270,7 @@ export const DashboardPage: React.FC = () => {
                       onClick={() =>
                         setAttachments((current) => current.filter((_, itemIndex) => itemIndex !== index))
                       }
-                      className="rounded-full p-0.5 hover:bg-blue-500/20"
+                      className="rounded-full p-0.5 hover:bg-blue-500/20 cursor-pointer"
                       aria-label={`Remove ${file.name}`}
                     >
                       <X className="h-3 w-3" />
@@ -222,30 +281,26 @@ export const DashboardPage: React.FC = () => {
             )}
 
             {attachmentError && (
-              <p className="mt-2 text-xs font-medium text-rose-500">{attachmentError}</p>
+              <p className="mt-1 text-[11px] font-medium text-rose-500">{attachmentError}</p>
             )}
           </div>
 
-          {/* Bottom Card Toolbar */}
-          <div
-            className={`flex items-center justify-between border-t px-4 py-3 sm:px-6 ${
-              isDark ? 'border-white/10 bg-[#0c101a]/80' : 'border-slate-100 bg-slate-50/80'
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              {/* Paperclip attach file */}
+          {/* Lovable-Style Bottom Toolbar: "+" on Left, Mode & Mic & Submit on Right */}
+          <div className="flex items-center justify-between px-3.5 pb-3 sm:px-4">
+            {/* Left: Plus attachment button */}
+            <div className="flex items-center">
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className={`rounded-lg p-2 transition-colors ${
+                className={`flex h-7 w-7 items-center justify-center rounded-lg transition-colors cursor-pointer ${
                   isDark
                     ? 'text-slate-400 hover:bg-white/10 hover:text-white'
-                    : 'text-slate-500 hover:bg-slate-200 hover:text-slate-900'
+                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
                 }`}
                 title="Attach a text or code file"
                 aria-label="Attach file"
               >
-                <Paperclip className="h-4 w-4" />
+                <Plus className="h-4 w-4" />
               </button>
               <input
                 ref={fileInputRef}
@@ -255,20 +310,23 @@ export const DashboardPage: React.FC = () => {
                 onChange={(event) => void handleFiles(event.target.files)}
                 className="hidden"
               />
+            </div>
 
-              {/* Mode selector (Build / Fix / Plan) */}
+            {/* Right: Mode dropdown + Mic + Submit */}
+            <div className="flex items-center gap-2">
+              {/* Build mode selector */}
               <div className="relative">
                 <button
                   type="button"
                   onClick={() => setShowModeDropdown((open) => !open)}
-                  className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-colors ${
+                  className={`flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold transition-colors cursor-pointer ${
                     isDark
-                      ? 'bg-white/10 text-slate-200 hover:bg-white/15'
-                      : 'bg-slate-200/80 text-slate-700 hover:bg-slate-200'
+                      ? 'text-slate-300 hover:bg-white/10'
+                      : 'text-slate-700 hover:bg-slate-100'
                   }`}
                 >
                   <ModeIcon className="h-3.5 w-3.5 text-blue-500" />
-                  <span className="text-[10px] font-bold uppercase">{mode}</span>
+                  <span className="text-xs">{mode}</span>
                   <ChevronDown className="h-3 w-3 text-slate-400" />
                 </button>
 
@@ -276,7 +334,7 @@ export const DashboardPage: React.FC = () => {
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setShowModeDropdown(false)} />
                     <div
-                      className={`absolute bottom-full left-0 z-50 mb-2 w-48 rounded-xl border p-1 shadow-2xl ${
+                      className={`absolute bottom-full right-0 z-50 mb-2 w-44 rounded-xl border p-1 shadow-2xl ${
                         isDark ? 'border-white/10 bg-[#0f1420]' : 'border-slate-200 bg-white'
                       }`}
                     >
@@ -291,29 +349,16 @@ export const DashboardPage: React.FC = () => {
                               setMode(item);
                               setShowModeDropdown(false);
                             }}
-                            className={`flex w-full items-start gap-2 rounded-lg px-2.5 py-2 text-left transition-colors ${
+                            className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs transition-colors cursor-pointer ${
                               mode === item
-                                ? 'bg-blue-600 text-white'
+                                ? 'bg-blue-600 text-white font-bold'
                                 : isDark
                                   ? 'text-slate-200 hover:bg-white/5'
                                   : 'text-slate-700 hover:bg-slate-100'
                             }`}
                           >
-                            <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                            <span>
-                              <span className="block text-xs font-bold">{meta.label}</span>
-                              <span
-                                className={`block text-[10px] ${
-                                  mode === item
-                                    ? 'text-blue-100'
-                                    : isDark
-                                      ? 'text-slate-400'
-                                      : 'text-slate-500'
-                                }`}
-                              >
-                                {meta.description}
-                              </span>
-                            </span>
+                            <Icon className="h-3.5 w-3.5 shrink-0" />
+                            <span>{meta.label}</span>
                           </button>
                         );
                       })}
@@ -322,91 +367,67 @@ export const DashboardPage: React.FC = () => {
                 )}
               </div>
 
-              {/* Voice recognition */}
+              {/* Mic / Voice with active pulse */}
               <button
                 type="button"
                 onClick={toggleSpeechRecognition}
-                className={`rounded-lg p-2 transition-colors ${
+                className={`flex h-7 w-7 items-center justify-center rounded-lg transition-all cursor-pointer ${
                   isListening
-                    ? 'animate-pulse bg-rose-500 text-white'
+                    ? 'bg-rose-500 text-white shadow-md shadow-rose-500/40 ring-2 ring-rose-400/50 animate-pulse'
                     : isDark
                       ? 'text-slate-400 hover:bg-white/10 hover:text-white'
-                      : 'text-slate-500 hover:bg-slate-200 hover:text-slate-900'
+                      : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
                 }`}
-                title={isListening ? 'Listening... Click to stop' : 'Click to speak your prompt'}
+                title={isListening ? 'Listening... click to stop' : 'Click to speak'}
                 aria-label="Voice input"
               >
-                <Mic className="h-4 w-4" />
+                <Mic className="h-3.5 w-3.5" />
               </button>
 
-              {/* Enter hint */}
-              <span
-                className={`hidden items-center gap-1.5 text-xs sm:flex ${
-                  isDark ? 'text-slate-500' : 'text-slate-400'
+              {/* Submit button */}
+              <button
+                type="submit"
+                disabled={!promptInput.trim()}
+                className={`flex h-7 w-7 items-center justify-center rounded-full transition-all ${
+                  promptInput.trim()
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30 hover:bg-blue-500 hover:scale-105 active:scale-95 cursor-pointer'
+                    : isDark
+                      ? 'bg-white/10 text-slate-500 cursor-not-allowed'
+                      : 'bg-slate-200 text-slate-400 cursor-not-allowed'
                 }`}
+                aria-label="Generate"
               >
-                <kbd
-                  className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
-                    isDark ? 'bg-white/10 text-slate-300' : 'bg-slate-200 text-slate-600'
-                  }`}
-                >
-                  Enter
-                </kbd>
-                <span>to submit</span>
-              </span>
+                <ArrowUp className="h-3.5 w-3.5 font-bold" />
+              </button>
             </div>
-
-            {/* Submit arrow button */}
-            <button
-              type="submit"
-              disabled={!promptInput.trim()}
-              className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all ${
-                promptInput.trim()
-                  ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25 hover:bg-blue-500 hover:scale-105 active:scale-95 cursor-pointer'
-                  : isDark
-                    ? 'bg-white/10 text-slate-500 cursor-not-allowed'
-                    : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-              }`}
-              aria-label="Generate project"
-            >
-              <ArrowUp className="h-4 w-4 font-bold" />
-            </button>
           </div>
         </form>
 
-        {/* Default Quick Prompt Chips (KaifGenUI style) */}
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-2.5">
-          {QUICK_PROMPTS.map((prompt) => (
+        {/* 4 Detailed 2-Line Default Prompts (No Emojis) */}
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full">
+          {QUICK_PROMPTS.map((promptText, index) => (
             <button
-              key={prompt.label}
+              key={index}
               type="button"
               onClick={() => {
-                setPromptInput(prompt.label);
+                setPromptInput(promptText);
                 textareaRef.current?.focus();
               }}
-              className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer ${
+              className={`flex flex-col text-left rounded-xl border p-3 text-xs leading-relaxed transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer ${
                 isDark
-                  ? 'border-white/10 bg-[#0f1420]/80 text-slate-300 hover:border-blue-500/40 hover:bg-blue-500/10 hover:text-white shadow-lg shadow-black/20'
+                  ? 'border-white/10 bg-[#0c101a]/70 text-slate-300 hover:border-blue-500/40 hover:bg-blue-500/10 hover:text-white shadow-sm'
                   : 'border-slate-200 bg-white text-slate-700 hover:border-blue-500/40 hover:bg-blue-50 hover:text-blue-600 shadow-sm'
               }`}
             >
-              <span className="text-sm">{prompt.emoji}</span>
-              <span>{prompt.label}</span>
+              <span className="line-clamp-2 font-medium">{promptText}</span>
             </button>
           ))}
         </div>
 
-        <Link
-          to="/projects"
-          className={`mt-6 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-xs font-semibold transition-colors ${
-            isDark
-              ? 'border-white/10 text-slate-300 hover:border-blue-500/40 hover:bg-white/5 hover:text-white'
-              : 'border-slate-200 text-slate-600 hover:border-blue-500/40 hover:bg-blue-50 hover:text-blue-600'
-          }`}
-        >
-          View all projects
-          <ChevronRight className="h-3.5 w-3.5" />
-        </Link>
+        {/* Adsterra Banner Ad (Pure banner, NO background box, NO "sponsored" wrapper) */}
+        <div className="mt-8 flex w-full justify-center">
+          <AdsterraBanner placement="dashboard" />
+        </div>
       </div>
     </div>
   );
