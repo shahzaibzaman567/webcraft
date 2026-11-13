@@ -7,6 +7,7 @@ import React, {
   useState,
 } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useClerk } from '@clerk/clerk-react';
 import {
   ChevronDown,
   FolderGit2,
@@ -15,6 +16,8 @@ import {
   LogOut,
   Menu,
   Moon,
+  PanelLeftClose,
+  PanelLeftOpen,
   Plus,
   Search,
   Settings,
@@ -25,7 +28,8 @@ import {
 import {
   getCurrentUser,
   isSuperAdmin,
-  logout,
+  clearAuthUser,
+  CLERK_ENABLED,
   updateLocalUser,
   type WebcraftUser,
 } from '../lib/auth';
@@ -60,7 +64,12 @@ const PAGE_TITLES: Record<string, string> = {
   '/integrations': 'Connectors & APIs',
 };
 
-export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+interface AppShellContentProps {
+  children: React.ReactNode;
+  clerkSignOut?: (options?: { redirectUrl?: string }) => Promise<void>;
+}
+
+const AppShellContent: React.FC<AppShellContentProps> = ({ children, clerkSignOut }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [user, setUser] = useState<WebcraftUser | null>(() => getCurrentUser());
@@ -72,6 +81,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
     return document.documentElement.classList.contains('dark');
   });
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [loadError, setLoadError] = useState('');
 
@@ -150,9 +160,13 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
     window.dispatchEvent(new CustomEvent('webcarft-theme-change', { detail: next }));
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const handleLogout = async () => {
+    clearAuthUser();
+    if (CLERK_ENABLED && clerkSignOut) {
+      await clerkSignOut({ redirectUrl: '/login' });
+    } else {
+      navigate('/login');
+    }
   };
 
   const filteredProjects = useMemo(() => {
@@ -214,8 +228,10 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
         )}
 
         <aside
-          className={`fixed inset-y-0 left-0 z-40 flex h-full w-64 shrink-0 flex-col overflow-hidden border-r transition-transform duration-300 lg:static lg:translate-x-0 ${surface} ${
-            sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          className={`fixed inset-y-0 left-0 z-40 flex h-full shrink-0 flex-col overflow-hidden border-r transition-all duration-300 lg:static ${surface} ${
+            sidebarCollapsed
+              ? 'w-0 -translate-x-full border-r-0 lg:w-0 lg:translate-x-0'
+              : 'w-64 ' + (sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0')
           }`}
         >
           <div className={`border-b p-3 ${isDark ? 'border-white/10' : 'border-slate-200'}`}>
@@ -226,14 +242,27 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                   Webcraft
                 </span>
               </Link>
-              <button
-                type="button"
-                onClick={() => setSidebarOpen(false)}
-                className={`rounded-lg p-1.5 lg:hidden ${muted} ${hover}`}
-                aria-label="Close sidebar"
-              >
-                <X className="h-4 w-4" />
-              </button>
+              <div className="flex items-center gap-1">
+                {/* Desktop Collapse Button */}
+                <button
+                  type="button"
+                  onClick={() => setSidebarCollapsed(true)}
+                  className={`hidden rounded-lg p-1.5 lg:flex items-center justify-center transition-colors ${muted} ${hover}`}
+                  title="Collapse sidebar"
+                  aria-label="Collapse sidebar"
+                >
+                  <PanelLeftClose className="h-4 w-4" />
+                </button>
+                {/* Mobile Close Button */}
+                <button
+                  type="button"
+                  onClick={() => setSidebarOpen(false)}
+                  className={`rounded-lg p-1.5 lg:hidden ${muted} ${hover}`}
+                  aria-label="Close sidebar"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
             </div>
 
             <div
@@ -413,6 +442,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
             }`}
           >
             <div className="flex min-w-0 items-center gap-2">
+              {/* Mobile open button */}
               <button
                 type="button"
                 onClick={() => setSidebarOpen(true)}
@@ -421,6 +451,22 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
               >
                 <Menu className="h-5 w-5" />
               </button>
+
+              {/* Desktop toggle / reopen button */}
+              <button
+                type="button"
+                onClick={() => setSidebarCollapsed((prev) => !prev)}
+                className={`hidden rounded-lg p-2 lg:flex items-center justify-center transition-colors ${muted} ${hover}`}
+                title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              >
+                {sidebarCollapsed ? (
+                  <PanelLeftOpen className="h-5 w-5 text-blue-500" />
+                ) : (
+                  <PanelLeftClose className="h-5 w-5" />
+                )}
+              </button>
+
               <div className="min-w-0">
                 <div className={`truncate text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   {pageTitle}
@@ -570,5 +616,13 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
     </AppShellContext.Provider>
   );
 };
+
+const ClerkAppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { signOut } = useClerk();
+  return <AppShellContent clerkSignOut={signOut}>{children}</AppShellContent>;
+};
+
+export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) =>
+  CLERK_ENABLED ? <ClerkAppShell>{children}</ClerkAppShell> : <AppShellContent>{children}</AppShellContent>;
 
 export default AppShell;

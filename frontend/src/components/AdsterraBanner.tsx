@@ -61,8 +61,6 @@ export interface AdsterraBannerProps {
   smartLinkFallback?: boolean;
 }
 
-export const SMARTLINK_URL = 'https://araplhn.org/4/674a0b10afa2107ceabcecec67b325cf';
-
 export const AdsterraBanner: React.FC<AdsterraBannerProps> = ({
   placement = 'dashboard',
   format,
@@ -136,40 +134,23 @@ export const AdsterraBanner: React.FC<AdsterraBannerProps> = ({
 
   return (
     <div
-      className={`my-3 flex flex-col items-center justify-center overflow-hidden rounded-xl border border-slate-200/60 bg-slate-50/50 p-2 shadow-xs dark:border-white/10 dark:bg-slate-900/40 ${className}`}
-      style={{ minHeight: `${config.height + 24}px` }}
+      className={`flex items-center justify-center overflow-hidden bg-transparent ${className}`}
+      style={{
+        width: `${config.width}px`,
+        maxWidth: '100%',
+        height: `${config.height}px`,
+      }}
     >
-      <div className="mb-1.5 flex items-center justify-between w-full px-2 text-[10px] font-mono tracking-wider text-slate-400 dark:text-slate-500 uppercase">
-        <span>Sponsored Dev Partner</span>
-        <a
-          href={SMARTLINK_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hover:text-blue-500 dark:hover:text-cyan-400 transition-colors"
-        >
-          Explore →
-        </a>
-      </div>
-
-      <div
-        className="flex items-center justify-center overflow-hidden rounded-lg bg-transparent"
-        style={{
-          width: `${config.width}px`,
-          maxWidth: '100%',
-          height: `${config.height}px`,
-        }}
-      >
-        <iframe
-          title={`adsterra-${config.key}`}
-          srcDoc={adHtml}
-          width={config.width}
-          height={config.height}
-          scrolling="no"
-          frameBorder="0"
-          className="border-0 overflow-hidden"
-          sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
-        />
-      </div>
+      <iframe
+        title={`adsterra-${config.key}`}
+        srcDoc={adHtml}
+        width={config.width}
+        height={config.height}
+        scrolling="no"
+        frameBorder="0"
+        className="border-0 overflow-hidden"
+        sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+      />
     </div>
   );
 };

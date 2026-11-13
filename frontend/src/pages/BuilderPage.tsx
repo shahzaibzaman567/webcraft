@@ -166,6 +166,7 @@ export const BuilderPage: React.FC = () => {
   const initialPrompt = searchParams.get('prompt') || '';
   const initialProjectName = searchParams.get('name') || '';
   const projectParamId = searchParams.get('project') || searchParams.get('id') || '';
+  const attachmentParam = searchParams.get('attachments') || '';
   const { projects, refreshProjects } = useConnectedServices();
   const { settings } = usePublicSettings();
   const currentUser = getCurrentUser();
@@ -237,7 +238,10 @@ export const BuilderPage: React.FC = () => {
   // Chat & AI states
   const [chatInput, setChatInput] = useState('');
   const [buildModeDropdown, setBuildModeDropdown] = useState(false);
-  const [buildMode, setBuildMode] = useState<'Build' | 'Plan' | 'Fix'>('Build');
+  const [buildMode, setBuildMode] = useState<'Build' | 'Plan' | 'Fix'>(() => {
+    const requestedMode = searchParams.get('mode');
+    return requestedMode === 'Plan' || requestedMode === 'Fix' ? requestedMode : 'Build';
+  });
   const [isGenerating, setIsGenerating] = useState(false);
   const [chatHistory, setChatHistory] = useState<Array<{
     sender: 'user' | 'assistant';
@@ -591,9 +595,36 @@ export const BuilderPage: React.FC = () => {
   }, [projectParamId]);
 
   useEffect(() => {
-    const prompt = initialPrompt.trim();
+    let prompt = initialPrompt.trim();
     if (projectParamId || !prompt || initialPromptHandled.current) return;
     initialPromptHandled.current = true;
+
+    if (attachmentParam) {
+      const storageKey = `webcraft_attachment_${attachmentParam}`;
+      try {
+        const raw = sessionStorage.getItem(storageKey);
+        if (raw) {
+          const parsed = JSON.parse(raw) as Array<{ name?: string; content?: string }>;
+          const files = Array.isArray(parsed)
+            ? parsed.filter(
+                (file): file is { name: string; content: string } =>
+                  typeof file?.name === 'string' &&
+                  typeof file?.content === 'string' &&
+                  file.content.trim().length > 0,
+              )
+            : [];
+          if (files.length > 0) {
+            prompt += `\n\nAttached reference files:\n${files
+              .map((file) => `--- ${file.name} ---\n${file.content}`)
+              .join('\n\n')}`;
+          }
+          sessionStorage.removeItem(storageKey);
+        }
+      } catch {
+        // Ignore malformed or unavailable attachment storage.
+      }
+    }
+
     void runGeneration(prompt, { desiredName: initialProjectName || undefined });
     // This effect intentionally runs only for the prompt passed on first navigation.
     // eslint-disable-next-line react-hooks/exhaustive-deps
