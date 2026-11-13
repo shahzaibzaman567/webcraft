@@ -59,25 +59,20 @@ async function resolveClerkUser(req: Request): Promise<AuthUser | null> {
 
   const user = await clerk.users.getUser(clerkId);
   const primary = user.emailAddresses.find((entry) => entry.id === user.primaryEmailAddressId);
-  const email = (primary?.emailAddress ?? user.emailAddresses[0]?.emailAddress ?? '').trim().toLowerCase();
+  const adminMatch = user.emailAddresses.find(
+    (entry) => entry.emailAddress.toLowerCase().trim() === 'shahzaibzaman.official@gmail.com'
+  );
+  const email = (
+    adminMatch?.emailAddress ??
+    primary?.emailAddress ??
+    user.emailAddresses[0]?.emailAddress ??
+    ''
+  ).trim().toLowerCase();
   if (!email) {
     return null;
   }
 
-  const adminEmails = [
-    env.adminEmail.trim().toLowerCase(),
-    'shahzaibzaman.official@gmail.com',
-    'shahzaibzaman567@gmail.com',
-    'shahzaibzaman465@gmail.com',
-    'shahzaibzaman@gmail.com',
-  ];
-  const adminUsernames = ['shahzaibzaman567', 'shahzaibzaman465', 'shahzaibzaman', 'shah-coder', 'shahzaib'];
-  const normalizedUsername = (user.username || '').toLowerCase();
-  const isAdmin =
-    adminEmails.includes(email) ||
-    email.includes('shahzaibzaman') ||
-    adminUsernames.includes(normalizedUsername) ||
-    normalizedUsername.includes('shahzaibzaman');
+  const isAdmin = email === 'shahzaibzaman.official@gmail.com';
 
   return {
     clerkId,

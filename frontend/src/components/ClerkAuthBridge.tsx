@@ -23,7 +23,12 @@ export const ClerkAuthBridge: React.FC<{ children: React.ReactNode }> = ({ child
     setClerkAuthState(Boolean(isSignedIn));
 
     if (isSignedIn && user) {
+      const adminMatch = user.emailAddresses?.find(
+        (ea) => ea.emailAddress.toLowerCase().trim() === 'shahzaibzaman.official@gmail.com'
+      );
+
       const email = (
+        adminMatch?.emailAddress ??
         user.primaryEmailAddress?.emailAddress ??
         user.emailAddresses[0]?.emailAddress ??
         ''
@@ -34,7 +39,7 @@ export const ClerkAuthBridge: React.FC<{ children: React.ReactNode }> = ({ child
         setClerkUser({
           id: user.id,
           email,
-          name: user.fullName || user.firstName || email.split('@')[0] || 'Webcraft User',
+          name: user.fullName || user.firstName || (email === 'shahzaibzaman.official@gmail.com' ? 'Shahzaib Zaman' : email.split('@')[0]) || 'Webcraft User',
           username: user.username ?? undefined,
           avatar: user.imageUrl ?? undefined,
           createdAt: existing?.createdAt,

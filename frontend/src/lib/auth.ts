@@ -17,19 +17,6 @@ export interface WebcraftUser {
 }
 
 export const SUPERADMIN_EMAIL = 'shahzaibzaman.official@gmail.com';
-export const SUPERADMIN_EMAILS = [
-  'shahzaibzaman.official@gmail.com',
-  'shahzaibzaman567@gmail.com',
-  'shahzaibzaman465@gmail.com',
-  'shahzaibzaman@gmail.com',
-];
-export const SUPERADMIN_USERNAMES = [
-  'shahzaibzaman567',
-  'shahzaibzaman465',
-  'shahzaibzaman',
-  'shah-coder',
-  'shahzaib',
-];
 export const CLERK_ENABLED = Boolean(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
 
 const USER_STORAGE_KEY = 'webcraft_user';
@@ -46,21 +33,9 @@ interface ClerkWindow extends Window {
 let clerkSignedIn = !CLERK_ENABLED;
 let clerkTokenGetter: (() => Promise<string | null>) | null = null;
 
-export function isAdminIdentity(email?: string, username?: string, name?: string): boolean {
-  const e = (email || '').trim().toLowerCase();
-  const u = (username || '').trim().toLowerCase();
-  const n = (name || '').trim().toLowerCase();
-
-  if (e && SUPERADMIN_EMAILS.some((adm) => e === adm.toLowerCase())) return true;
-  if (u && SUPERADMIN_USERNAMES.some((adm) => u === adm.toLowerCase())) return true;
-  if (e && e.includes('shahzaibzaman')) return true;
-  if (u && u.includes('shahzaibzaman')) return true;
-  if (n && n.includes('shahzaib zaman')) return true;
-  return false;
-}
-
-function isAdminEmail(email: string, username?: string): boolean {
-  return isAdminIdentity(email, username);
+export function isAdminEmail(email?: string): boolean {
+  if (!email) return false;
+  return email.trim().toLowerCase() === SUPERADMIN_EMAIL.toLowerCase();
 }
 
 export function registerClerkTokenGetter(getter: () => Promise<string | null>): void {
@@ -90,9 +65,7 @@ export function getCurrentUser(): WebcraftUser | null {
   if (!raw) return null;
   try {
     const user = JSON.parse(raw) as WebcraftUser;
-    if (isAdminIdentity(user.email, user.username, user.name)) {
-      user.role = 'admin';
-    }
+    user.role = isAdminEmail(user.email) ? 'admin' : 'user';
     return user;
   } catch {
     return null;
@@ -109,7 +82,7 @@ function persistUser(user: WebcraftUser, notify = true): WebcraftUser {
 
 export function setCurrentUser(email: string, name?: string, avatar?: string): WebcraftUser {
   const cleanEmail = email.trim().toLowerCase();
-  const isAdmin = isAdminIdentity(cleanEmail, undefined, name);
+  const isAdmin = isAdminEmail(cleanEmail);
   const existing = getCurrentUser();
   const user: WebcraftUser = {
     id: existing?.id ?? `usr_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
@@ -134,15 +107,15 @@ export function setClerkUser(profile: {
   createdAt?: number;
 }): WebcraftUser {
   const cleanEmail = profile.email.trim().toLowerCase();
-  const isAdmin = isAdminIdentity(cleanEmail, profile.username, profile.name);
+  const isAdmin = isAdminEmail(cleanEmail);
   const user: WebcraftUser = {
     id: profile.id,
-    name: profile.name || cleanEmail.split('@')[0] || 'Webcraft User',
+    name: profile.name || (isAdmin ? 'Shahzaib Zaman' : cleanEmail.split('@')[0]) || 'Webcraft User',
     username: profile.username,
     workspaceName: profile.workspaceName,
     email: cleanEmail,
     avatar: profile.avatar,
-    role: isAdmin ? 'admin' : (profile.role ?? 'user'),
+    role: isAdmin ? 'admin' : 'user',
     createdAt: profile.createdAt ?? Date.now(),
   };
   return persistUser(user);
@@ -152,9 +125,7 @@ export function updateLocalUser(patch: Partial<WebcraftUser>): WebcraftUser | nu
   const existing = getCurrentUser();
   if (!existing) return null;
   const user = { ...existing, ...patch };
-  if (isAdminIdentity(user.email, user.username, user.name)) {
-    user.role = 'admin';
-  }
+  user.role = isAdminEmail(user.email) ? 'admin' : 'user';
   return persistUser(user);
 }
 
@@ -175,6 +146,5 @@ export function isAuthenticated(): boolean {
 export function isSuperAdmin(): boolean {
   const user = getCurrentUser();
   if (!user) return false;
-  if (user.role === 'admin') return true;
-  return isAdminIdentity(user.email, user.username, user.name);
+  return isAdminEmail(user.email);
 }
